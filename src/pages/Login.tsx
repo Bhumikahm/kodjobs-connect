@@ -57,14 +57,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+    <div 
+      className="min-h-screen flex flex-col justify-center items-center p-4"
+      style={{
+        backgroundImage: "url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=2000&auto=format')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+    >
+      <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
       
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl"
+        className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl z-10"
       >
         <div className="relative h-32 bg-gradient-to-r from-kod-blue to-kod-blueLight">
           <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg">
@@ -206,9 +215,9 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="mt-8"
+        className="mt-8 z-10"
       >
-        <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-kod-blue transition-colors flex items-center gap-1">
+        <Link to="/" className="text-white hover:text-kod-blue transition-colors flex items-center gap-1">
           &larr; Back to home
         </Link>
       </motion.div>

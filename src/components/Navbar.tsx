@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { BriefcaseIcon, LogInIcon, UserPlusIcon, MenuIcon, XIcon } from 'lucide-react';
+import { BriefcaseIcon, LogInIcon, UserPlusIcon, MenuIcon, XIcon, HomeIcon, NewspaperIcon, DollarSignIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -43,6 +43,31 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
+            <Button asChild variant="ghost" className="text-sm font-medium">
+              <Link to="/">
+                <HomeIcon className="mr-2 h-4 w-4" />
+                Home
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-sm font-medium">
+              <Link to="/blog">
+                <NewspaperIcon className="mr-2 h-4 w-4" />
+                Blog
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-sm font-medium">
+              <Link to="/jobs">
+                <BriefcaseIcon className="mr-2 h-4 w-4" />
+                Jobs
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="text-sm font-medium">
+              <Link to="/pricing">
+                <DollarSignIcon className="mr-2 h-4 w-4" />
+                Pricing
+              </Link>
+            </Button>
+            
             {isAuthenticated ? (
               <>
                 <Button asChild variant="ghost" className="text-sm font-medium">
@@ -89,6 +114,23 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden glassmorphism shadow-lg mt-3 mx-4 rounded-xl overflow-hidden animate-scale-in">
           <nav className="flex flex-col py-4">
+            <Link to="/" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
+              <HomeIcon className="mr-2 h-4 w-4" />
+              Home
+            </Link>
+            <Link to="/blog" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
+              <NewspaperIcon className="mr-2 h-4 w-4" />
+              Blog
+            </Link>
+            <Link to="/jobs" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
+              <BriefcaseIcon className="mr-2 h-4 w-4" />
+              Jobs
+            </Link>
+            <Link to="/pricing" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
+              <DollarSignIcon className="mr-2 h-4 w-4" />
+              Pricing
+            </Link>
+            
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard" className="px-6 py-3 hover:bg-kod-grayLight transition-colors">

@@ -30,6 +30,9 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/blog" element={<NotFound />} />
+                <Route path="/jobs" element={<NotFound />} />
+                <Route path="/pricing" element={<NotFound />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AnimatedTransition>
