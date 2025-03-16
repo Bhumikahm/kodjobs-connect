@@ -32,7 +32,8 @@ import {
   BuildingIcon,
   DollarSignIcon,
   ClockIcon,
-  CalendarIcon
+  CalendarIcon,
+  AlertCircleIcon
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -365,6 +366,45 @@ const Dashboard = () => {
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 8;
+  const [profileCompletionItems, setProfileCompletionItems] = useState({
+    title: false,
+    summary: false,
+    skills: false,
+    phone: false,
+    location: false,
+    linkedin: false,
+    github: false,
+    education: false,
+    experience: false,
+    photo: false,
+    resume: false
+  });
+
+  // Calculate profile completion based on filled items
+  const calculateProfileCompletion = () => {
+    const items = { ...profileCompletionItems };
+    
+    // Check each field
+    items.title = !!profileData.title;
+    items.summary = !!profileData.summary;
+    items.skills = !!profileData.skills;
+    items.phone = !!profileData.phone;
+    items.location = !!profileData.location;
+    items.linkedin = !!profileData.linkedin;
+    items.github = !!profileData.github;
+    items.education = !!profileData.education;
+    items.experience = !!profileData.experience;
+    items.photo = !!profileImage;
+    items.resume = !!resumeFile;
+    
+    setProfileCompletionItems(items);
+    
+    // Calculate percentage (11 total items)
+    const filledItems = Object.values(items).filter(Boolean).length;
+    const completionPercentage = Math.round((filledItems / 11) * 100);
+    
+    return completionPercentage;
+  };
 
   useEffect(() => {
     // In a real app, we would fetch the profile data from the API
@@ -381,10 +421,27 @@ const Dashboard = () => {
         education: 'BS Computer Science, Stanford University',
         experience: '5+ years of frontend development experience'
       });
+      
+      // Update profile completion after data is loaded
+      setTimeout(() => {
+        const completion = calculateProfileCompletion();
+        updateUser({ profileCompletion: completion });
+      }, 100);
     }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Update profile completion whenever relevant data changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      const completion = calculateProfileCompletion();
+      // Only update if different to avoid infinite loop
+      if (completion !== user?.profileCompletion) {
+        updateUser({ profileCompletion: completion });
+      }
+    }
+  }, [profileData, profileImage, resumeFile]);
 
   if (isLoading) {
     return (
@@ -407,9 +464,8 @@ const Dashboard = () => {
     // Simulate API call
     setTimeout(() => {
       // Update profile completion percentage
-      updateUser({ 
-        profileCompletion: 85 
-      });
+      const completion = calculateProfileCompletion();
+      updateUser({ profileCompletion: completion });
       
       setIsUpdating(false);
       setShowProfileModal(false);
@@ -435,29 +491,22 @@ const Dashboard = () => {
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === 'string') {
           setProfileImage(event.target.result);
-          // Update profile completion
-          updateUser({ 
-            profileCompletion: (user?.profileCompletion || 0) + 5 > 100 ? 100 : (user?.profileCompletion || 0) + 5
-          });
-          
-          toast({
-            title: "Profile photo uploaded",
-            description: "Your profile photo has been updated successfully",
-          });
+          // Profile completion will be calculated by useEffect
         }
       };
       reader.readAsDataURL(e.target.files[0]);
+      
+      toast({
+        title: "Profile photo uploaded",
+        description: "Your profile photo has been updated successfully",
+      });
     }
   };
 
   const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setResumeFile(e.target.files[0]);
-      
-      // Update profile completion
-      updateUser({ 
-        profileCompletion: (user?.profileCompletion || 0) + 10 > 100 ? 100 : (user?.profileCompletion || 0) + 10
-      });
+      // Profile completion will be calculated by useEffect
       
       toast({
         title: "Resume uploaded",
@@ -479,6 +528,17 @@ const Dashboard = () => {
   };
 
   const handleApplyJob = (jobId: number) => {
+    const job = sampleJobs.find(j => j.id === jobId);
+    
+    if (job && job.match < 80) {
+      toast({
+        title: "Application not submitted",
+        description: "You need at least 80% match to apply for this job",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (!appliedJobs.includes(jobId)) {
       setAppliedJobs(prev => [...prev, jobId]);
       
@@ -502,7 +562,7 @@ const Dashboard = () => {
 
   return (
     <div 
-      className="min-h-screen pt-20 pb-16"
+      className="min-h-screen pt-20 pb-16 relative"
       style={{
         backgroundImage: "url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2000&auto=format')",
         backgroundSize: "cover",
@@ -512,7 +572,8 @@ const Dashboard = () => {
     >
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-[#1A1F2C]/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16">
         {/* Enhanced background with animated gradient patterns */}
-        <div className="absolute inset-0 bg-gradient-mesh opacity-20"></div>
+        <div className="absolute inset-0 bg-gradient-mesh-vibrant opacity-30"></div>
+        <div className="absolute inset-0 bg-nebula opacity-40"></div>
         <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
         
         {/* Animated orbs */}
@@ -731,6 +792,22 @@ const Dashboard = () => {
                           rows={3} 
                         />
                       </div>
+                      
+                      <div>
+                        <Label htmlFor="experience" className="text-gray-200 flex items-center gap-1">
+                          <BriefcaseIcon className="h-4 w-4" />
+                          Work Experience
+                        </Label>
+                        <Textarea 
+                          id="experience" 
+                          name="experience"
+                          value={profileData.experience} 
+                          onChange={handleInputChange}
+                          placeholder="Your work experience" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                          rows={3} 
+                        />
+                      </div>
                     </div>
                   </div>
                   
@@ -776,7 +853,7 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <p className="text-sm text-gray-200 mb-1">Profile Completion</p>
                   <div className="flex items-center gap-3">
-                    <Progress value={user?.profileCompletion || 0} className="h-2 flex-1 bg-white/10" indicatorClassName="bg-gradient-to-r from-purple-500 to-pink-500" />
+                    <Progress value={user?.profileCompletion || 0} className="h-2 flex-1 bg-white/10" />
                     <span className="text-sm font-medium text-white">{user?.profileCompletion || 0}%</span>
                   </div>
                 </div>
@@ -827,8 +904,16 @@ const Dashboard = () => {
                             {job.company}
                           </CardDescription>
                         </div>
-                        <div className="bg-purple-500/20 px-2 py-1 rounded-full flex items-center">
-                          <span className="text-xs font-medium text-purple-300">{job.match}% Match</span>
+                        <div className={`px-2 py-1 rounded-full flex items-center ${
+                          job.match >= 90 ? "bg-green-500/20" : 
+                          job.match >= 80 ? "bg-purple-500/20" : 
+                          "bg-orange-500/20"
+                        }`}>
+                          <span className={`text-xs font-medium ${
+                            job.match >= 90 ? "text-green-300" : 
+                            job.match >= 80 ? "text-purple-300" : 
+                            "text-orange-300"
+                          }`}>{job.match}% Match</span>
                         </div>
                       </div>
                     </CardHeader>
@@ -857,9 +942,11 @@ const Dashboard = () => {
                         View Details
                       </Button>
                       <Button 
-                        variant="outline" 
+                        variant={job.match < 80 ? "outline" : appliedJobs.includes(job.id) ? "outline" : "outline"}
                         className={appliedJobs.includes(job.id) 
                           ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
+                          : job.match < 80
+                          ? "border-orange-500/30 text-orange-300 hover:bg-orange-500/10"
                           : "border-white/20 text-white hover:bg-white/10"
                         }
                         onClick={() => handleApplyJob(job.id)}
@@ -869,6 +956,11 @@ const Dashboard = () => {
                           <>
                             <CheckCircleIcon className="h-4 w-4 mr-2" />
                             Applied
+                          </>
+                        ) : job.match < 80 ? (
+                          <>
+                            <AlertCircleIcon className="h-4 w-4 mr-2" />
+                            Low Match
                           </>
                         ) : "Apply Now"}
                       </Button>
@@ -1041,8 +1133,16 @@ const Dashboard = () => {
                 <span className="text-sm text-gray-200">{selectedJob?.type}</span>
               </div>
               
-              <div className="bg-purple-500/20 px-3 py-1 rounded-full flex items-center">
-                <span className="text-sm text-purple-300">{selectedJob?.match}% Match</span>
+              <div className={`px-3 py-1 rounded-full flex items-center ${
+                selectedJob && selectedJob.match >= 90 ? "bg-green-500/20" : 
+                selectedJob && selectedJob.match >= 80 ? "bg-purple-500/20" : 
+                "bg-orange-500/20"
+              }`}>
+                <span className={`text-sm ${
+                  selectedJob && selectedJob.match >= 90 ? "text-green-300" : 
+                  selectedJob && selectedJob.match >= 80 ? "text-purple-300" : 
+                  "text-orange-300"
+                }`}>{selectedJob?.match}% Match</span>
               </div>
             </div>
             
@@ -1063,27 +1163,34 @@ const Dashboard = () => {
                   <p className="text-gray-300 text-sm mt-1">Your profile is {user?.profileCompletion || 0}% complete</p>
                 </div>
                 
-                <Button 
-                  variant="default" 
-                  className={appliedJobs.includes(selectedJob?.id || 0) 
-                    ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                  }
-                  onClick={() => {
-                    if (selectedJob) {
-                      handleApplyJob(selectedJob.id);
-                      setShowJobModal(false);
+                {selectedJob && selectedJob.match < 80 ? (
+                  <div className="bg-orange-500/20 px-4 py-2 rounded-lg text-orange-300 text-sm flex items-center">
+                    <AlertCircleIcon className="h-4 w-4 mr-2" />
+                    Minimum 80% match required to apply
+                  </div>
+                ) : (
+                  <Button 
+                    variant="default" 
+                    className={appliedJobs.includes(selectedJob?.id || 0) 
+                      ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
+                      : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
                     }
-                  }}
-                  disabled={appliedJobs.includes(selectedJob?.id || 0)}
-                >
-                  {appliedJobs.includes(selectedJob?.id || 0) ? (
-                    <>
-                      <CheckCircleIcon className="h-4 w-4 mr-2" />
-                      Already Applied
-                    </>
-                  ) : "Apply Now"}
-                </Button>
+                    onClick={() => {
+                      if (selectedJob) {
+                        handleApplyJob(selectedJob.id);
+                        setShowJobModal(false);
+                      }
+                    }}
+                    disabled={appliedJobs.includes(selectedJob?.id || 0)}
+                  >
+                    {appliedJobs.includes(selectedJob?.id || 0) ? (
+                      <>
+                        <CheckCircleIcon className="h-4 w-4 mr-2" />
+                        Already Applied
+                      </>
+                    ) : "Apply Now"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

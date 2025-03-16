@@ -13,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     // Preload the hero image
     const img = new Image();
-    img.src = "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80";
+    img.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80";
     img.onload = () => setIsImageLoaded(true);
   }, []);
 
@@ -25,12 +25,37 @@ const Home = () => {
         <div 
           className={`absolute inset-0 transition-all duration-1000 ${isImageLoaded ? 'image-blur-loaded' : 'image-blur-loading'}`}
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')",
             backgroundSize: "cover",
-            backgroundPosition: "center"
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed"
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+          {/* Enhanced overlay with gradient and patterns */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-mesh-vibrant opacity-30" />
+          <div className="absolute inset-0 bg-nebula opacity-40" />
+          
+          {/* Animated floating orbs */}
+          <motion.div 
+            initial={{ x: "10vw", y: "10vh" }}
+            animate={{ 
+              x: ["10vw", "15vw", "5vw", "10vw"],
+              y: ["10vh", "15vh", "5vh", "10vh"]
+            }}
+            transition={{ repeat: Infinity, duration: 20, ease: "easeInOut" }}
+            className="absolute h-56 w-56 rounded-full bg-kod-blue/20 filter blur-[80px]"
+          />
+          
+          <motion.div 
+            initial={{ x: "70vw", y: "30vh" }}
+            animate={{ 
+              x: ["70vw", "75vw", "65vw", "70vw"],
+              y: ["30vh", "25vh", "35vh", "30vh"]
+            }}
+            transition={{ repeat: Infinity, duration: 25, ease: "easeInOut", delay: 1 }}
+            className="absolute h-64 w-64 rounded-full bg-purple-500/20 filter blur-[80px]"
+          />
         </div>
 
         {/* Content */}
@@ -42,7 +67,7 @@ const Home = () => {
             className="max-w-3xl"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Find Your Perfect Career Path with <span className="text-kod-blue">KodJobs</span>
+              Find Your Perfect Career Path with <span className="text-gradient-blue">KodJobs</span>
             </h1>
             <p className="text-xl text-gray-200 mb-8">
               Connecting talented professionals with innovative companies. Discover opportunities that match your skills and aspirations.
@@ -50,14 +75,14 @@ const Home = () => {
 
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
-                <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white">
+                <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white shadow-glow">
                   <Link to="/dashboard">
                     Go to Dashboard
                   </Link>
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white">
+                  <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white shadow-glow">
                     <Link to="/signup">
                       Get Started
                     </Link>
@@ -83,11 +108,16 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-hidden">
+        {/* Background patterns */}
+        <div className="absolute inset-0 bg-gradient-mesh-vibrant opacity-20"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        
+        {/* Content */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose KodJobs</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Why Choose KodJobs</h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
               Our innovative platform offers a seamless job-seeking experience with features designed to help you succeed.
             </p>
           </div>
@@ -99,13 +129,13 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl p-8 shadow-md card-hover border border-gray-100"
+              className="bg-white/5 backdrop-blur-md rounded-xl p-8 shadow-md card-hover border border-white/10"
             >
               <div className="h-12 w-12 bg-kod-blue/10 rounded-lg flex items-center justify-center mb-6">
                 <UserIcon className="h-6 w-6 text-kod-blue" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Smart Profile Building</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-3 text-white">Smart Profile Building</h3>
+              <p className="text-gray-300">
                 Create a comprehensive profile that highlights your skills and experience to attract the right opportunities.
               </p>
             </motion.div>
@@ -116,13 +146,13 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl p-8 shadow-md card-hover border border-gray-100"
+              className="bg-white/5 backdrop-blur-md rounded-xl p-8 shadow-md card-hover border border-white/10"
             >
               <div className="h-12 w-12 bg-kod-blue/10 rounded-lg flex items-center justify-center mb-6">
                 <SearchIcon className="h-6 w-6 text-kod-blue" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Tailored Job Matches</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-3 text-white">Tailored Job Matches</h3>
+              <p className="text-gray-300">
                 Our intelligent algorithm recommends jobs that match your skills, experience, and career goals.
               </p>
             </motion.div>
@@ -133,20 +163,20 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl p-8 shadow-md card-hover border border-gray-100"
+              className="bg-white/5 backdrop-blur-md rounded-xl p-8 shadow-md card-hover border border-white/10"
             >
               <div className="h-12 w-12 bg-kod-blue/10 rounded-lg flex items-center justify-center mb-6">
                 <TrendingUpIcon className="h-6 w-6 text-kod-blue" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Career Growth Tools</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-3 text-white">Career Growth Tools</h3>
+              <p className="text-gray-300">
                 Access resources and insights to help you advance in your career and achieve your professional goals.
               </p>
             </motion.div>
           </div>
 
           <div className="mt-16 text-center">
-            <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white">
+            <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white shadow-glow">
               <Link to={isAuthenticated ? "/dashboard" : "/signup"}>
                 {isAuthenticated ? "View Dashboard" : "Join KodJobs Today"}
               </Link>
@@ -156,8 +186,9 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-white py-12 relative">
+        <div className="absolute inset-0 bg-gradient-mesh opacity-10"></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
               <Link to="/" className="flex items-center gap-2">
@@ -184,7 +215,7 @@ const Home = () => {
               <div>
                 <h4 className="text-sm font-semibold uppercase tracking-wider mb-4">Resources</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                  <li><Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
                   <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
                   <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
                 </ul>
