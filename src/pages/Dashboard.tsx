@@ -734,3 +734,114 @@ const Dashboard = () => {
               </div>
               
               {/* Contact & Education */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <PhoneIcon className="mr-2 h-5 w-5 text-purple-400" />
+                  Contact & Education
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone2" className="text-gray-200">Phone Number</Label>
+                      <Input 
+                        id="phone2" 
+                        name="phone"
+                        value={profileData.phone} 
+                        onChange={handleInputChange}
+                        placeholder="Your phone number" 
+                        className="mt-1 bg-white/5 border-white/20 text-white" 
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="location2" className="text-gray-200">Location</Label>
+                      <Input 
+                        id="location2" 
+                        name="location"
+                        value={profileData.location} 
+                        onChange={handleInputChange}
+                        placeholder="City, Country" 
+                        className="mt-1 bg-white/5 border-white/20 text-white" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="linkedin" className="text-gray-200 flex items-center gap-1">
+                        <LinkedinIcon className="h-3.5 w-3.5" />
+                        LinkedIn
+                      </Label>
+                      <Input 
+                        id="linkedin" 
+                        name="linkedin"
+                        value={profileData.linkedin} 
+                        onChange={handleInputChange}
+                        placeholder="linkedin.com/in/username" 
+                        className="mt-1 bg-white/5 border-white/20 text-white" 
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="github" className="text-gray-200 flex items-center gap-1">
+                        <GithubIcon className="h-3.5 w-3.5" />
+                        GitHub
+                      </Label>
+                      <Input 
+                        id="github" 
+                        name="github"
+                        value={profileData.github} 
+                        onChange={handleInputChange}
+                        placeholder="github.com/username" 
+                        className="mt-1 bg-white/5 border-white/20 text-white" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="education" className="text-gray-200 flex items-center gap-1">
+                      <GraduationCapIcon className="h-4 w-4" />
+                      Education
+                    </Label>
+                    <Textarea 
+                      id="education" 
+                      name="education"
+                      value={profileData.education} 
+                      onChange={handleInputChange}
+                      placeholder="Your educational background" 
+                      className="mt-1 bg-white/5 border-white/20 text-white" 
+                      rows={3} 
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 flex justify-end">
+              <Button 
+                onClick={handleProfileUpdate}
+                disabled={isUpdating}
+                className="px-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                {isUpdating ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <SaveIcon className="mr-2 h-4 w-4" />
+                    Save Profile
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
