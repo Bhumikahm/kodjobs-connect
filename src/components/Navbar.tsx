@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Briefcase2Icon, LogInIcon, UserPlusIcon, MenuIcon, XIcon, HomeIcon, NewspaperIcon, DollarSignIcon } from 'lucide-react';
+import { BriefcaseIcon, LogInIcon, UserPlusIcon, MenuIcon, XIcon, HomeIcon, NewspaperIcon, DollarSignIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
@@ -11,7 +10,6 @@ const Navbar = () => {
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -20,12 +18,10 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when changing routes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Hide pricing in dashboard
   const isDashboard = location.pathname === '/dashboard';
 
   return (
@@ -36,10 +32,9 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="relative h-10 w-10 rounded-full bg-gradient-to-r from-kod-blue to-purple-500 shadow-lg flex items-center justify-center overflow-hidden">
-              <Briefcase2Icon className="h-6 w-6 text-white absolute transform translate-y-[1px]" />
+              <BriefcaseIcon className="h-6 w-6 text-white absolute transform translate-y-[1px]" />
               <div className="absolute inset-0 bg-gradient-to-tr from-kod-blue/30 to-transparent"></div>
             </div>
             <span className="text-2xl font-display font-semibold">
@@ -48,7 +43,6 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             <Button asChild variant="ghost" className="text-sm font-medium">
               <Link to="/">
@@ -64,7 +58,7 @@ const Navbar = () => {
             </Button>
             <Button asChild variant="ghost" className="text-sm font-medium">
               <Link to="/jobs">
-                <Briefcase2Icon className="mr-2 h-4 w-4" />
+                <BriefcaseIcon className="mr-2 h-4 w-4" />
                 Jobs
               </Link>
             </Button>
@@ -105,7 +99,6 @@ const Navbar = () => {
             )}
           </nav>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 focus:outline-none"
@@ -120,7 +113,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden glassmorphism shadow-lg mt-3 mx-4 rounded-xl overflow-hidden animate-scale-in">
           <nav className="flex flex-col py-4">
@@ -133,7 +125,7 @@ const Navbar = () => {
               Blog
             </Link>
             <Link to="/jobs" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
-              <Briefcase2Icon className="mr-2 h-4 w-4" />
+              <BriefcaseIcon className="mr-2 h-4 w-4" />
               Jobs
             </Link>
             

@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import usersData from '../data/users.json';
 
 interface User {
-  id: string;
+  id: number | string;
   name: string;
   email: string;
   dateOfBirth?: string;
