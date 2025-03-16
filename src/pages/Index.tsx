@@ -8,45 +8,14 @@ import { LogInIcon, UserPlusIcon, BriefcaseIcon } from 'lucide-react';
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden">
-      {/* Enhanced animated background with gradient mesh */}
-      <div className="absolute inset-0 bg-gradient-mesh opacity-60 z-0"></div>
+      {/* Animated background with gradient mesh */}
+      <div className="absolute inset-0 bg-gradient-mesh opacity-40 z-0 animate-pulse-slow"></div>
       
       {/* Animated pattern overlay */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-15 z-0"></div>
+      <div className="absolute inset-0 bg-grid-pattern opacity-10 z-0"></div>
       
       {/* Radial gradient overlay */}
       <div className="absolute inset-0 bg-radial-gradient z-0"></div>
-      
-      {/* Animated colorful orbs */}
-      <motion.div 
-        initial={{ x: "10vw", y: "10vh" }}
-        animate={{ 
-          x: ["10vw", "15vw", "5vw", "10vw"],
-          y: ["10vh", "15vh", "5vh", "10vh"]
-        }}
-        transition={{ repeat: Infinity, duration: 20, ease: "easeInOut" }}
-        className="absolute h-56 w-56 rounded-full bg-purple-500/20 filter blur-3xl"
-      />
-      
-      <motion.div 
-        initial={{ x: "80vw", y: "30vh" }}
-        animate={{ 
-          x: ["80vw", "85vw", "75vw", "80vw"],
-          y: ["30vh", "25vh", "35vh", "30vh"]
-        }}
-        transition={{ repeat: Infinity, duration: 25, ease: "easeInOut", delay: 1 }}
-        className="absolute h-64 w-64 rounded-full bg-blue-500/20 filter blur-3xl"
-      />
-      
-      <motion.div 
-        initial={{ x: "50vw", y: "70vh" }}
-        animate={{ 
-          x: ["50vw", "45vw", "55vw", "50vw"],
-          y: ["70vh", "75vh", "65vh", "70vh"]
-        }}
-        transition={{ repeat: Infinity, duration: 18, ease: "easeInOut", delay: 2 }}
-        className="absolute h-72 w-72 rounded-full bg-pink-500/20 filter blur-3xl"
-      />
       
       {/* Content container */}
       <div className="container mx-auto px-4 relative z-10">

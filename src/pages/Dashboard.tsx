@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { 
   BriefcaseIcon, 
@@ -28,11 +28,7 @@ import {
   CheckCircleIcon,
   UploadIcon,
   XIcon,
-  GraduationCapIcon,
-  BuildingIcon,
-  DollarSignIcon,
-  ClockIcon,
-  CalendarIcon
+  GraduationCapIcon
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -359,8 +355,6 @@ const Dashboard = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<typeof sampleJobs[0] | null>(null);
-  const [showJobModal, setShowJobModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -489,11 +483,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleViewJobDetails = (job: typeof sampleJobs[0]) => {
-    setSelectedJob(job);
-    setShowJobModal(true);
-  };
-
   // Pagination logic
   const pageCount = Math.ceil(sampleJobs.length / jobsPerPage);
   const indexOfLastJob = currentPage * jobsPerPage;
@@ -510,16 +499,7 @@ const Dashboard = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-[#1A1F2C]/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16">
-        {/* Enhanced background with animated gradient patterns */}
-        <div className="absolute inset-0 bg-gradient-mesh opacity-20"></div>
-        <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
-        
-        {/* Animated orbs */}
-        <div className="absolute top-1/4 left-10 w-20 h-20 bg-kod-blue/10 rounded-full blur-xl animate-bounce-gentle"></div>
-        <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse-slow"></div>
-        <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl animate-bounce-gentle"></div>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mb-8">
@@ -805,290 +785,208 @@ const Dashboard = () => {
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/jobs" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
+                    <BriefcaseIcon className="h-4 w-4" />
+                    <span>Jobs</span>
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem className="ml-auto">
+                <Button variant="ghost" onClick={logout} className="px-4 py-2 text-white hover:text-purple-300 hover:bg-white/10 transition-colors">
+                  Logout
+                </Button>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
 
-        {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h2 className="text-2xl font-bold text-white mb-4">Recommended Jobs</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {currentJobs.map(job => (
-                  <Card key={job.id} className="bg-white/5 border border-white/10 overflow-hidden transition-all hover:bg-white/10 hover:border-white/20">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-white text-lg">{job.title}</CardTitle>
-                          <CardDescription className="text-gray-300 flex items-center mt-1">
-                            <BuildingIcon className="h-3.5 w-3.5 mr-1" />
-                            {job.company}
-                          </CardDescription>
+        <div className="mb-10">
+          <Tabs defaultValue="recommended" className="w-full">
+            <TabsList className="mb-8 bg-white/10 backdrop-blur-md p-1 rounded-lg border border-white/20">
+              <TabsTrigger value="recommended" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Recommended Jobs</TabsTrigger>
+              <TabsTrigger value="saved" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Saved Jobs</TabsTrigger>
+              <TabsTrigger value="applied" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Applied Jobs</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="recommended" className="mt-0">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {currentJobs.map((job) => (
+                  <motion.div
+                    key={job.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: job.id % 8 * 0.1 }}
+                  >
+                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden group hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
+                      <CardHeader className="pb-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-xl group-hover:text-purple-300 transition-colors">{job.title}</CardTitle>
+                            <CardDescription className="mt-1 text-gray-300">{job.company} • {job.location}</CardDescription>
+                          </div>
+                          <div className="rounded-full px-3 py-1 text-xs font-medium bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30">
+                            {job.match}% Match
+                          </div>
                         </div>
-                        <div className="bg-purple-500/20 px-2 py-1 rounded-full flex items-center">
-                          <span className="text-xs font-medium text-purple-300">{job.match}% Match</span>
+                      </CardHeader>
+                      <CardContent className="pb-4 flex-1">
+                        <div className="flex gap-3 mb-4 flex-wrap">
+                          <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
+                            {job.type}
+                          </div>
+                          <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
+                            {job.salary}
+                          </div>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pb-2 text-sm text-gray-300">
-                      <div className="flex flex-wrap gap-y-1 gap-x-4 mb-3">
-                        <div className="flex items-center gap-1">
-                          <MapPinIcon className="h-3.5 w-3.5 text-gray-400" />
-                          <span>{job.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <DollarSignIcon className="h-3.5 w-3.5 text-gray-400" />
-                          <span>{job.salary}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ClockIcon className="h-3.5 w-3.5 text-gray-400" />
-                          <span>{job.type}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between pt-1">
-                      <Button 
-                        variant="ghost" 
-                        className="text-purple-300 hover:text-purple-100 hover:bg-purple-900/20"
-                        onClick={() => handleViewJobDetails(job)}
-                      >
-                        View Details
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className={appliedJobs.includes(job.id) 
-                          ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
-                          : "border-white/20 text-white hover:bg-white/10"
-                        }
-                        onClick={() => handleApplyJob(job.id)}
-                        disabled={appliedJobs.includes(job.id)}
-                      >
+                        <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
+                      </CardContent>
+                      <CardFooter className="pt-0 flex items-center justify-between mt-auto">
+                        <span className="text-xs text-gray-400">Posted {job.posted}</span>
                         {appliedJobs.includes(job.id) ? (
-                          <>
-                            <CheckCircleIcon className="h-4 w-4 mr-2" />
+                          <Button variant="outline" size="sm" className="border-green-500/50 text-green-300 flex items-center gap-2" disabled>
+                            <CheckCircleIcon className="h-4 w-4" />
                             Applied
-                          </>
-                        ) : "Apply Now"}
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white" 
+                            onClick={() => handleApplyJob(job.id)}
+                          >
+                            Apply Now
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
               
               {/* Pagination */}
-              <Pagination className="mt-6">
-                <PaginationContent className="text-white">
+              <Pagination className="mt-8">
+                <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className={currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}
-                      aria-disabled={currentPage === 1}
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) setCurrentPage(currentPage - 1);
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                   
-                  {Array.from({ length: Math.min(5, pageCount) }).map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink 
-                          onClick={() => setCurrentPage(pageNum)}
-                          isActive={currentPage === pageNum}
-                          className={currentPage === pageNum 
-                            ? "bg-purple-500/20 border-purple-500/40" 
-                            : "hover:bg-white/10"
-                          }
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink 
+                        href="#" 
+                        isActive={currentPage === index + 1}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(index + 1);
+                        }}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                   
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
-                      className={currentPage === pageCount ? "opacity-50 cursor-not-allowed" : ""}
-                      aria-disabled={currentPage === pageCount}
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < pageCount) setCurrentPage(currentPage + 1);
+                      }}
+                      className={currentPage === pageCount ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          </div>
-          
-          <div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h2 className="text-xl font-bold text-white mb-4">Your Profile</h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex-none">
-                    <Avatar className="h-14 w-14 border-2 border-white/30">
-                      <AvatarImage src={profileImage || undefined} />
-                      <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-lg">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium">{user?.name || "User"}</h3>
-                    <p className="text-gray-300 text-sm">{profileData.title || "Add your professional title"}</p>
-                  </div>
-                </div>
-                
-                <div className="pt-2">
-                  <h4 className="text-white text-sm font-medium mb-1">Professional Summary</h4>
-                  <p className="text-gray-300 text-sm">
-                    {profileData.summary || "Add a brief description about yourself and your career goals."}
-                  </p>
-                </div>
-                
-                <div className="pt-2">
-                  <h4 className="text-white text-sm font-medium mb-1">Skills</h4>
-                  <p className="text-gray-300 text-sm">
-                    {profileData.skills || "Add your key skills and technologies."}
-                  </p>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowProfileModal(true)}
-                  className="w-full mt-4 border-white/20 text-white hover:bg-white/10"
-                >
-                  <UserIcon className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-                
-                {!resumeFile && (
-                  <Button 
-                    variant="outline" 
-                    onClick={triggerResumeUpload}
-                    className="w-full border-white/20 text-white hover:bg-white/10"
-                  >
-                    <UploadIcon className="h-4 w-4 mr-2" />
-                    Upload Resume
-                  </Button>
-                )}
-              </div>
-            </div>
+            </TabsContent>
             
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 mt-6">
-              <h2 className="text-xl font-bold text-white mb-4">Job Application Status</h2>
-              
-              <div className="space-y-3">
-                {appliedJobs.length > 0 ? (
-                  appliedJobs.map(jobId => {
-                    const job = sampleJobs.find(j => j.id === jobId);
+            <TabsContent value="saved" className="mt-0">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
+                <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                  <BriefcaseIcon className="h-10 w-10 text-white/70" />
+                </div>
+                <h3 className="text-xl font-medium mb-2 text-white">No saved jobs yet</h3>
+                <p className="text-gray-300 mb-4">
+                  Save jobs you're interested in to revisit them later
+                </p>
+                <Button variant="outline" className="border-white/40 text-white hover:bg-white/20">Browse Jobs</Button>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="applied" className="mt-0">
+              {appliedJobs.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {appliedJobs.map(id => {
+                    const job = sampleJobs.find(j => j.id === id);
                     if (!job) return null;
                     
                     return (
-                      <div key={job.id} className="bg-white/5 p-3 rounded-lg border border-white/10">
-                        <h3 className="text-white font-medium">{job.title}</h3>
-                        <p className="text-gray-300 text-sm">{job.company}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <CalendarIcon className="h-3.5 w-3.5 text-gray-400" />
-                          <span className="text-gray-300 text-xs">Applied {job.posted}</span>
-                        </div>
-                        <div className="bg-yellow-500/20 rounded-full px-2 py-0.5 text-xs text-yellow-300 inline-block mt-2">
-                          Under Review
-                        </div>
-                      </div>
+                      <motion.div
+                        key={job.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
+                          <CardHeader className="pb-4">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <CardTitle className="text-xl">{job.title}</CardTitle>
+                                <CardDescription className="mt-1 text-gray-300">{job.company} • {job.location}</CardDescription>
+                              </div>
+                              <div className="rounded-full px-3 py-1 text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
+                                Applied
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pb-4 flex-1">
+                            <div className="flex gap-3 mb-4 flex-wrap">
+                              <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
+                                {job.type}
+                              </div>
+                              <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
+                                {job.salary}
+                              </div>
+                            </div>
+                            <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
+                          </CardContent>
+                          <CardFooter className="pt-0 flex items-center justify-between mt-auto">
+                            <span className="text-xs text-gray-400">Applied just now</span>
+                            <Button variant="outline" size="sm" className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white">
+                              View Details
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      </motion.div>
                     );
-                  })
-                ) : (
-                  <div className="text-center py-6">
-                    <BriefcaseIcon className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-                    <p className="text-gray-300">You haven't applied to any jobs yet.</p>
-                    <p className="text-gray-400 text-sm mt-1">Browse the recommended jobs and start applying!</p>
+                  })}
+                </div>
+              ) : (
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
+                  <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                    <BriefcaseIcon className="h-10 w-10 text-white/70" />
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+                  <h3 className="text-xl font-medium mb-2 text-white">No applications yet</h3>
+                  <p className="text-gray-300 mb-4">
+                    When you apply to jobs, they will appear here
+                  </p>
+                  <Button variant="outline" className="border-white/40 text-white hover:bg-white/20">Browse Jobs</Button>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-      
-      {/* Job Details Modal */}
-      <Dialog open={showJobModal} onOpenChange={setShowJobModal}>
-        <DialogContent className="max-w-3xl w-[90vw] bg-black/90 border border-white/20 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <BriefcaseIcon className="h-5 w-5 text-purple-400" />
-              {selectedJob?.title}
-            </DialogTitle>
-            <DialogDescription className="text-gray-300 flex items-center mt-1">
-              <BuildingIcon className="h-4 w-4 mr-1" />
-              {selectedJob?.company}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 mt-2">
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
-                <MapPinIcon className="h-4 w-4 mr-1 text-gray-300" />
-                <span className="text-sm text-gray-200">{selectedJob?.location}</span>
-              </div>
-              
-              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
-                <DollarSignIcon className="h-4 w-4 mr-1 text-gray-300" />
-                <span className="text-sm text-gray-200">{selectedJob?.salary}</span>
-              </div>
-              
-              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
-                <ClockIcon className="h-4 w-4 mr-1 text-gray-300" />
-                <span className="text-sm text-gray-200">{selectedJob?.type}</span>
-              </div>
-              
-              <div className="bg-purple-500/20 px-3 py-1 rounded-full flex items-center">
-                <span className="text-sm text-purple-300">{selectedJob?.match}% Match</span>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white">Job Description</h3>
-              <p className="text-gray-300 mt-2">{selectedJob?.description}</p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white">Requirements</h3>
-              <p className="text-gray-300 mt-2">{selectedJob?.requirements}</p>
-            </div>
-            
-            <div className="bg-white/5 p-4 rounded-lg border border-white/10 mt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-white font-medium">Ready to apply?</h3>
-                  <p className="text-gray-300 text-sm mt-1">Your profile is {user?.profileCompletion || 0}% complete</p>
-                </div>
-                
-                <Button 
-                  variant="default" 
-                  className={appliedJobs.includes(selectedJob?.id || 0) 
-                    ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                  }
-                  onClick={() => {
-                    if (selectedJob) {
-                      handleApplyJob(selectedJob.id);
-                      setShowJobModal(false);
-                    }
-                  }}
-                  disabled={appliedJobs.includes(selectedJob?.id || 0)}
-                >
-                  {appliedJobs.includes(selectedJob?.id || 0) ? (
-                    <>
-                      <CheckCircleIcon className="h-4 w-4 mr-2" />
-                      Already Applied
-                    </>
-                  ) : "Apply Now"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
