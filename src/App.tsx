@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import AnimatedTransition from "./components/AnimatedTransition";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
@@ -18,7 +18,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="bg-grid-pattern min-h-screen">
+      <div className="min-h-screen">
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -26,13 +26,10 @@ const App = () => (
             <Navbar />
             <AnimatedTransition>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/blog" element={<NotFound />} />
-                <Route path="/jobs" element={<NotFound />} />
-                <Route path="/pricing" element={<NotFound />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AnimatedTransition>
