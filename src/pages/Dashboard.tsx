@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -804,6 +805,292 @@ const Dashboard = () => {
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+
+        {/* Main content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <h2 className="text-2xl font-bold text-white mb-4">Recommended Jobs</h2>
               
-              <NavigationMenuItem>
-                <
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {currentJobs.map(job => (
+                  <Card key={job.id} className="bg-white/5 border border-white/10 overflow-hidden transition-all hover:bg-white/10 hover:border-white/20">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-white text-lg">{job.title}</CardTitle>
+                          <CardDescription className="text-gray-300 flex items-center mt-1">
+                            <BuildingIcon className="h-3.5 w-3.5 mr-1" />
+                            {job.company}
+                          </CardDescription>
+                        </div>
+                        <div className="bg-purple-500/20 px-2 py-1 rounded-full flex items-center">
+                          <span className="text-xs font-medium text-purple-300">{job.match}% Match</span>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pb-2 text-sm text-gray-300">
+                      <div className="flex flex-wrap gap-y-1 gap-x-4 mb-3">
+                        <div className="flex items-center gap-1">
+                          <MapPinIcon className="h-3.5 w-3.5 text-gray-400" />
+                          <span>{job.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <DollarSignIcon className="h-3.5 w-3.5 text-gray-400" />
+                          <span>{job.salary}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <ClockIcon className="h-3.5 w-3.5 text-gray-400" />
+                          <span>{job.type}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-1">
+                      <Button 
+                        variant="ghost" 
+                        className="text-purple-300 hover:text-purple-100 hover:bg-purple-900/20"
+                        onClick={() => handleViewJobDetails(job)}
+                      >
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className={appliedJobs.includes(job.id) 
+                          ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
+                          : "border-white/20 text-white hover:bg-white/10"
+                        }
+                        onClick={() => handleApplyJob(job.id)}
+                        disabled={appliedJobs.includes(job.id)}
+                      >
+                        {appliedJobs.includes(job.id) ? (
+                          <>
+                            <CheckCircleIcon className="h-4 w-4 mr-2" />
+                            Applied
+                          </>
+                        ) : "Apply Now"}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              <Pagination className="mt-6">
+                <PaginationContent className="text-white">
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className={currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}
+                      aria-disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: Math.min(5, pageCount) }).map((_, i) => {
+                    const pageNum = i + 1;
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink 
+                          onClick={() => setCurrentPage(pageNum)}
+                          isActive={currentPage === pageNum}
+                          className={currentPage === pageNum 
+                            ? "bg-purple-500/20 border-purple-500/40" 
+                            : "hover:bg-white/10"
+                          }
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
+                      className={currentPage === pageCount ? "opacity-50 cursor-not-allowed" : ""}
+                      aria-disabled={currentPage === pageCount}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </div>
+          
+          <div>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <h2 className="text-xl font-bold text-white mb-4">Your Profile</h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-none">
+                    <Avatar className="h-14 w-14 border-2 border-white/30">
+                      <AvatarImage src={profileImage || undefined} />
+                      <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-lg">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-medium">{user?.name || "User"}</h3>
+                    <p className="text-gray-300 text-sm">{profileData.title || "Add your professional title"}</p>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <h4 className="text-white text-sm font-medium mb-1">Professional Summary</h4>
+                  <p className="text-gray-300 text-sm">
+                    {profileData.summary || "Add a brief description about yourself and your career goals."}
+                  </p>
+                </div>
+                
+                <div className="pt-2">
+                  <h4 className="text-white text-sm font-medium mb-1">Skills</h4>
+                  <p className="text-gray-300 text-sm">
+                    {profileData.skills || "Add your key skills and technologies."}
+                  </p>
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowProfileModal(true)}
+                  className="w-full mt-4 border-white/20 text-white hover:bg-white/10"
+                >
+                  <UserIcon className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+                
+                {!resumeFile && (
+                  <Button 
+                    variant="outline" 
+                    onClick={triggerResumeUpload}
+                    className="w-full border-white/20 text-white hover:bg-white/10"
+                  >
+                    <UploadIcon className="h-4 w-4 mr-2" />
+                    Upload Resume
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 mt-6">
+              <h2 className="text-xl font-bold text-white mb-4">Job Application Status</h2>
+              
+              <div className="space-y-3">
+                {appliedJobs.length > 0 ? (
+                  appliedJobs.map(jobId => {
+                    const job = sampleJobs.find(j => j.id === jobId);
+                    if (!job) return null;
+                    
+                    return (
+                      <div key={job.id} className="bg-white/5 p-3 rounded-lg border border-white/10">
+                        <h3 className="text-white font-medium">{job.title}</h3>
+                        <p className="text-gray-300 text-sm">{job.company}</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <CalendarIcon className="h-3.5 w-3.5 text-gray-400" />
+                          <span className="text-gray-300 text-xs">Applied {job.posted}</span>
+                        </div>
+                        <div className="bg-yellow-500/20 rounded-full px-2 py-0.5 text-xs text-yellow-300 inline-block mt-2">
+                          Under Review
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-6">
+                    <BriefcaseIcon className="h-8 w-8 text-gray-500 mx-auto mb-2" />
+                    <p className="text-gray-300">You haven't applied to any jobs yet.</p>
+                    <p className="text-gray-400 text-sm mt-1">Browse the recommended jobs and start applying!</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Job Details Modal */}
+      <Dialog open={showJobModal} onOpenChange={setShowJobModal}>
+        <DialogContent className="max-w-3xl w-[90vw] bg-black/90 border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <BriefcaseIcon className="h-5 w-5 text-purple-400" />
+              {selectedJob?.title}
+            </DialogTitle>
+            <DialogDescription className="text-gray-300 flex items-center mt-1">
+              <BuildingIcon className="h-4 w-4 mr-1" />
+              {selectedJob?.company}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-2">
+            <div className="flex flex-wrap gap-4">
+              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
+                <MapPinIcon className="h-4 w-4 mr-1 text-gray-300" />
+                <span className="text-sm text-gray-200">{selectedJob?.location}</span>
+              </div>
+              
+              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
+                <DollarSignIcon className="h-4 w-4 mr-1 text-gray-300" />
+                <span className="text-sm text-gray-200">{selectedJob?.salary}</span>
+              </div>
+              
+              <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
+                <ClockIcon className="h-4 w-4 mr-1 text-gray-300" />
+                <span className="text-sm text-gray-200">{selectedJob?.type}</span>
+              </div>
+              
+              <div className="bg-purple-500/20 px-3 py-1 rounded-full flex items-center">
+                <span className="text-sm text-purple-300">{selectedJob?.match}% Match</span>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-white">Job Description</h3>
+              <p className="text-gray-300 mt-2">{selectedJob?.description}</p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-white">Requirements</h3>
+              <p className="text-gray-300 mt-2">{selectedJob?.requirements}</p>
+            </div>
+            
+            <div className="bg-white/5 p-4 rounded-lg border border-white/10 mt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-white font-medium">Ready to apply?</h3>
+                  <p className="text-gray-300 text-sm mt-1">Your profile is {user?.profileCompletion || 0}% complete</p>
+                </div>
+                
+                <Button 
+                  variant="default" 
+                  className={appliedJobs.includes(selectedJob?.id || 0) 
+                    ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
+                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  }
+                  onClick={() => {
+                    if (selectedJob) {
+                      handleApplyJob(selectedJob.id);
+                      setShowJobModal(false);
+                    }
+                  }}
+                  disabled={appliedJobs.includes(selectedJob?.id || 0)}
+                >
+                  {appliedJobs.includes(selectedJob?.id || 0) ? (
+                    <>
+                      <CheckCircleIcon className="h-4 w-4 mr-2" />
+                      Already Applied
+                    </>
+                  ) : "Apply Now"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Dashboard;
