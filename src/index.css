@@ -141,3 +141,11 @@
 .animate-bounce-gentle {
   animation: bounce-gentle 8s ease-in-out infinite;
 }
+
+/* Background gradient mesh for more attractive background */
+.bg-gradient-mesh {
+  background: linear-gradient(217deg, rgba(255,0,0,.1), rgba(255,0,0,0) 70.71%),
+              linear-gradient(127deg, rgba(0,255,0,.1), rgba(0,255,0,0) 70.71%),
+              linear-gradient(336deg, rgba(0,0,255,.1), rgba(0,0,255,0) 70.71%);
+}
+

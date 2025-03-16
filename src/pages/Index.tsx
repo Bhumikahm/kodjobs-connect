@@ -58,22 +58,22 @@ const Index = () => {
             that match your skills and aspirations.
           </motion.p>
           
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Made larger and more prominent */}
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-6 justify-center"
           >
-            <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white px-8 py-6 text-lg h-auto">
+            <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white px-10 py-7 text-xl h-auto shadow-glow">
               <Link to="/signup">
-                <UserPlusIcon className="mr-2 h-5 w-5" />
+                <UserPlusIcon className="mr-3 h-6 w-6" />
                 Sign Up
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg h-auto">
+            <Button asChild size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-10 py-7 text-xl h-auto">
               <Link to="/login">
-                <LogInIcon className="mr-2 h-5 w-5" />
+                <LogInIcon className="mr-3 h-6 w-6" />
                 Login
               </Link>
             </Button>

@@ -47,16 +47,16 @@ const Navbar = () => {
             </span>
           </Link>
 
-          <div className="flex items-center space-x-2">
-            <Button asChild variant="ghost" className="text-sm font-medium">
+          <div className="flex items-center space-x-4">
+            <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10">
               <Link to="/login">
-                <LogInIcon className="mr-2 h-4 w-4" />
+                <LogInIcon className="mr-2 h-5 w-5" />
                 Login
               </Link>
             </Button>
-            <Button asChild className="bg-kod-blue hover:bg-kod-blueDark text-white">
+            <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
               <Link to="/signup">
-                <UserPlusIcon className="mr-2 h-4 w-4" />
+                <UserPlusIcon className="mr-2 h-5 w-5" />
                 Sign Up
               </Link>
             </Button>
