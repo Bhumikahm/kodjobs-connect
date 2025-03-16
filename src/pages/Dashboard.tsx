@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Navigate, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Navigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -12,12 +13,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { 
   BriefcaseIcon, 
   UserIcon, 
-  PencilIcon, 
-  GraduationCapIcon, 
-  AwardIcon, 
   PhoneIcon, 
   MapPinIcon, 
   LinkedinIcon, 
@@ -26,15 +25,14 @@ import {
   FileTextIcon,
   HomeIcon,
   NewspaperIcon,
-  DollarSignIcon,
   CheckCircleIcon,
   UploadIcon,
   XIcon,
-  SettingsIcon
+  GraduationCapIcon
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-// Sample job listings
+// Extended sample job listings (25 jobs)
 const sampleJobs = [
   {
     id: 1,
@@ -83,13 +81,264 @@ const sampleJobs = [
     description: "Guide our product team in developing cutting-edge solutions...",
     requirements: "5+ years of product management experience...",
     posted: "Just now"
+  },
+  {
+    id: 5,
+    title: "DevOps Engineer",
+    company: "CloudTech Solutions",
+    location: "Seattle, WA",
+    salary: "$115,000 - $145,000",
+    type: "Full-time",
+    match: 91,
+    description: "Join our DevOps team to build and maintain cloud infrastructure...",
+    requirements: "Experience with AWS, Docker, Kubernetes, and CI/CD pipelines...",
+    posted: "1 day ago"
+  },
+  {
+    id: 6,
+    title: "Data Scientist",
+    company: "DataInsights Inc.",
+    location: "Boston, MA",
+    salary: "$110,000 - $150,000",
+    type: "Full-time",
+    match: 88,
+    description: "Looking for a Data Scientist to help analyze and extract insights...",
+    requirements: "Strong background in statistics, machine learning, and Python...",
+    posted: "3 days ago"
+  },
+  {
+    id: 7,
+    title: "Mobile Developer (iOS)",
+    company: "AppWorks",
+    location: "Portland, OR",
+    salary: "$95,000 - $125,000",
+    type: "Full-time",
+    match: 84,
+    description: "Develop innovative iOS applications for our client base...",
+    requirements: "Experience with Swift, iOS SDK, and mobile app architecture...",
+    posted: "2 weeks ago"
+  },
+  {
+    id: 8,
+    title: "Backend Engineer",
+    company: "ServerStack",
+    location: "Chicago, IL",
+    salary: "$100,000 - $130,000",
+    type: "Full-time",
+    match: 89,
+    description: "Build scalable backend systems for our growing platform...",
+    requirements: "Experience with Java, Spring Boot, and distributed systems...",
+    posted: "4 days ago"
+  },
+  {
+    id: 9,
+    title: "Technical Project Manager",
+    company: "ProjectPro",
+    location: "Denver, CO",
+    salary: "$105,000 - $135,000",
+    type: "Full-time",
+    match: 81,
+    description: "Lead technical projects from conception to completion...",
+    requirements: "PMP certification and experience with Agile methodologies...",
+    posted: "1 week ago"
+  },
+  {
+    id: 10,
+    title: "QA Engineer",
+    company: "QualityFirst",
+    location: "Raleigh, NC",
+    salary: "$85,000 - $110,000",
+    type: "Full-time",
+    match: 86,
+    description: "Ensure product quality through thorough testing processes...",
+    requirements: "Experience with test automation and quality assurance methodologies...",
+    posted: "Just now"
+  },
+  {
+    id: 11,
+    title: "Blockchain Developer",
+    company: "ChainTech",
+    location: "Remote",
+    salary: "$120,000 - $160,000",
+    type: "Full-time",
+    match: 77,
+    description: "Develop and implement blockchain solutions for financial applications...",
+    requirements: "Experience with Ethereum, Solidity, and smart contracts...",
+    posted: "3 days ago"
+  },
+  {
+    id: 12,
+    title: "AI Research Scientist",
+    company: "IntelliTech",
+    location: "Cambridge, MA",
+    salary: "$130,000 - $180,000",
+    type: "Full-time",
+    match: 82,
+    description: "Research and develop cutting-edge AI algorithms and models...",
+    requirements: "PhD in Computer Science, Machine Learning, or related field...",
+    posted: "5 days ago"
+  },
+  {
+    id: 13,
+    title: "Systems Administrator",
+    company: "ServerOps",
+    location: "Austin, TX",
+    salary: "$90,000 - $120,000",
+    type: "Full-time",
+    match: 79,
+    description: "Maintain and optimize our internal IT infrastructure...",
+    requirements: "Experience with Linux, Windows Server, and networking...",
+    posted: "1 week ago"
+  },
+  {
+    id: 14,
+    title: "Technical Writer",
+    company: "DocuTech",
+    location: "Remote",
+    salary: "$75,000 - $95,000",
+    type: "Full-time",
+    match: 88,
+    description: "Create clear, concise technical documentation for our products...",
+    requirements: "Strong writing skills and ability to explain complex concepts...",
+    posted: "2 days ago"
+  },
+  {
+    id: 15,
+    title: "Security Engineer",
+    company: "CyberDefense",
+    location: "Washington, DC",
+    salary: "$110,000 - $150,000",
+    type: "Full-time",
+    match: 92,
+    description: "Protect our systems and data from security threats...",
+    requirements: "Experience with security tools, threat modeling, and penetration testing...",
+    posted: "1 day ago"
+  },
+  {
+    id: 16,
+    title: "Game Developer",
+    company: "GameStudio",
+    location: "Los Angeles, CA",
+    salary: "$95,000 - $125,000",
+    type: "Full-time",
+    match: 80,
+    description: "Create engaging gaming experiences for our users...",
+    requirements: "Experience with Unity, C#, and game physics...",
+    posted: "3 days ago"
+  },
+  {
+    id: 17,
+    title: "Database Administrator",
+    company: "DataSystems",
+    location: "Phoenix, AZ",
+    salary: "$100,000 - $130,000",
+    type: "Full-time",
+    match: 85,
+    description: "Manage and optimize our database infrastructure...",
+    requirements: "Experience with SQL, PostgreSQL, and database optimization...",
+    posted: "1 week ago"
+  },
+  {
+    id: 18,
+    title: "AR/VR Developer",
+    company: "RealityLabs",
+    location: "Seattle, WA",
+    salary: "$105,000 - $140,000",
+    type: "Full-time",
+    match: 78,
+    description: "Develop immersive AR/VR experiences for our platform...",
+    requirements: "Experience with Unity, ARKit/ARCore, and 3D modeling...",
+    posted: "2 days ago"
+  },
+  {
+    id: 19,
+    title: "Digital Marketing Specialist",
+    company: "GrowthHackers",
+    location: "Miami, FL",
+    salary: "$80,000 - $110,000",
+    type: "Full-time",
+    match: 83,
+    description: "Drive digital marketing strategies to increase user acquisition...",
+    requirements: "Experience with SEO, SEM, and social media marketing...",
+    posted: "4 days ago"
+  },
+  {
+    id: 20,
+    title: "Cloud Architect",
+    company: "CloudWorks",
+    location: "Remote",
+    salary: "$130,000 - $170,000",
+    type: "Full-time",
+    match: 90,
+    description: "Design and implement cloud-based solutions for our clients...",
+    requirements: "AWS/Azure certifications and experience with cloud migration...",
+    posted: "1 day ago"
+  },
+  {
+    id: 21,
+    title: "Embedded Systems Engineer",
+    company: "IoTech",
+    location: "San Jose, CA",
+    salary: "$110,000 - $140,000",
+    type: "Full-time",
+    match: 82,
+    description: "Develop firmware and software for IoT devices...",
+    requirements: "Experience with C/C++, microcontrollers, and embedded Linux...",
+    posted: "5 days ago"
+  },
+  {
+    id: 22,
+    title: "UI/UX Researcher",
+    company: "UserFirst",
+    location: "Chicago, IL",
+    salary: "$90,000 - $120,000",
+    type: "Full-time",
+    match: 87,
+    description: "Conduct user research to improve our product user experience...",
+    requirements: "Experience with user testing, interviews, and usability analysis...",
+    posted: "1 week ago"
+  },
+  {
+    id: 23,
+    title: "Data Engineer",
+    company: "DataFlow",
+    location: "Denver, CO",
+    salary: "$100,000 - $140,000",
+    type: "Full-time",
+    match: 89,
+    description: "Build and maintain data pipelines and infrastructure...",
+    requirements: "Experience with ETL processes, Apache Spark, and data warehousing...",
+    posted: "2 days ago"
+  },
+  {
+    id: 24,
+    title: "Technical Support Engineer",
+    company: "SupportPro",
+    location: "Austin, TX",
+    salary: "$70,000 - $90,000",
+    type: "Full-time",
+    match: 84,
+    description: "Provide technical support to our enterprise customers...",
+    requirements: "Strong problem-solving skills and customer service orientation...",
+    posted: "3 days ago"
+  },
+  {
+    id: 25,
+    title: "Machine Learning Engineer",
+    company: "AILabs",
+    location: "Boston, MA",
+    salary: "$120,000 - $160,000",
+    type: "Full-time",
+    match: 91,
+    description: "Implement machine learning models for production use...",
+    requirements: "Experience with TensorFlow, PyTorch, and ML deployment...",
+    posted: "1 day ago"
   }
 ];
 
 const Dashboard = () => {
   const { user, isAuthenticated, isLoading, updateUser, logout } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [profileData, setProfileData] = useState({
     title: '',
     summary: '',
@@ -108,6 +357,8 @@ const Dashboard = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 8;
 
   useEffect(() => {
     // In a real app, we would fetch the profile data from the API
@@ -231,6 +482,12 @@ const Dashboard = () => {
       });
     }
   };
+
+  // Pagination logic
+  const pageCount = Math.ceil(sampleJobs.length / jobsPerPage);
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = sampleJobs.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
     <div 
@@ -406,6 +663,54 @@ const Dashboard = () => {
                           />
                         </div>
                       </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="linkedin" className="text-gray-200 flex items-center gap-1">
+                            <LinkedinIcon className="h-3.5 w-3.5" />
+                            LinkedIn
+                          </Label>
+                          <Input 
+                            id="linkedin" 
+                            name="linkedin"
+                            value={profileData.linkedin} 
+                            onChange={handleInputChange}
+                            placeholder="linkedin.com/in/username" 
+                            className="mt-1 bg-white/5 border-white/20 text-white" 
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="github" className="text-gray-200 flex items-center gap-1">
+                            <GithubIcon className="h-3.5 w-3.5" />
+                            GitHub
+                          </Label>
+                          <Input 
+                            id="github" 
+                            name="github"
+                            value={profileData.github} 
+                            onChange={handleInputChange}
+                            placeholder="github.com/username" 
+                            className="mt-1 bg-white/5 border-white/20 text-white" 
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="education" className="text-gray-200 flex items-center gap-1">
+                          <GraduationCapIcon className="h-4 w-4" />
+                          Education
+                        </Label>
+                        <Textarea 
+                          id="education" 
+                          name="education"
+                          value={profileData.education} 
+                          onChange={handleInputChange}
+                          placeholder="Your educational background" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                          rows={3} 
+                        />
+                      </div>
                     </div>
                   </div>
                   
@@ -490,15 +795,6 @@ const Dashboard = () => {
                 </NavigationMenuLink>
               </NavigationMenuItem>
               
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link to="/pricing" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
-                    <DollarSignIcon className="h-4 w-4" />
-                    <span>Pricing</span>
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              
               <NavigationMenuItem className="ml-auto">
                 <Button variant="ghost" onClick={logout} className="px-4 py-2 text-white hover:text-purple-300 hover:bg-white/10 transition-colors">
                   Logout
@@ -517,15 +813,15 @@ const Dashboard = () => {
             </TabsList>
             
             <TabsContent value="recommended" className="mt-0">
-              <div className="grid md:grid-cols-2 gap-6">
-                {sampleJobs.map((job) => (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {currentJobs.map((job) => (
                   <motion.div
                     key={job.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: job.id * 0.1 }}
+                    transition={{ duration: 0.3, delay: job.id % 8 * 0.1 }}
                   >
-                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden group hover:shadow-glow hover:border-purple-500/50 transition-all duration-300">
+                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden group hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
                       <CardHeader className="pb-4">
                         <div className="flex justify-between items-start">
                           <div>
@@ -537,8 +833,8 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="pb-4">
-                        <div className="flex gap-3 mb-4">
+                      <CardContent className="pb-4 flex-1">
+                        <div className="flex gap-3 mb-4 flex-wrap">
                           <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
                             {job.type}
                           </div>
@@ -548,7 +844,7 @@ const Dashboard = () => {
                         </div>
                         <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
                       </CardContent>
-                      <CardFooter className="pt-0 flex items-center justify-between">
+                      <CardFooter className="pt-0 flex items-center justify-between mt-auto">
                         <span className="text-xs text-gray-400">Posted {job.posted}</span>
                         {appliedJobs.includes(job.id) ? (
                           <Button variant="outline" size="sm" className="border-green-500/50 text-green-300 flex items-center gap-2" disabled>
@@ -570,6 +866,48 @@ const Dashboard = () => {
                   </motion.div>
                 ))}
               </div>
+              
+              {/* Pagination */}
+              <Pagination className="mt-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) setCurrentPage(currentPage - 1);
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink 
+                        href="#" 
+                        isActive={currentPage === index + 1}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(index + 1);
+                        }}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < pageCount) setCurrentPage(currentPage + 1);
+                      }}
+                      className={currentPage === pageCount ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </TabsContent>
             
             <TabsContent value="saved" className="mt-0">
@@ -587,7 +925,7 @@ const Dashboard = () => {
             
             <TabsContent value="applied" className="mt-0">
               {appliedJobs.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {appliedJobs.map(id => {
                     const job = sampleJobs.find(j => j.id === id);
                     if (!job) return null;
@@ -599,7 +937,7 @@ const Dashboard = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden hover:shadow-glow hover:border-purple-500/50 transition-all duration-300">
+                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
                           <CardHeader className="pb-4">
                             <div className="flex justify-between items-start">
                               <div>
@@ -611,8 +949,8 @@ const Dashboard = () => {
                               </div>
                             </div>
                           </CardHeader>
-                          <CardContent className="pb-4">
-                            <div className="flex gap-3 mb-4">
+                          <CardContent className="pb-4 flex-1">
+                            <div className="flex gap-3 mb-4 flex-wrap">
                               <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
                                 {job.type}
                               </div>
@@ -622,7 +960,7 @@ const Dashboard = () => {
                             </div>
                             <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
                           </CardContent>
-                          <CardFooter className="pt-0 flex items-center justify-between">
+                          <CardFooter className="pt-0 flex items-center justify-between mt-auto">
                             <span className="text-xs text-gray-400">Applied just now</span>
                             <Button variant="outline" size="sm" className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white">
                               View Details
@@ -647,197 +985,6 @@ const Dashboard = () => {
               )}
             </TabsContent>
           </Tabs>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-sm overflow-hidden border border-white/20 text-white">
-          <div className="p-6 border-b border-white/10">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Complete Your Profile</h2>
-              <span className="text-sm text-gray-300">
-                Last updated: {new Date().toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-
-          <div className="p-6">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Professional Info */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <BriefcaseIcon className="mr-2 h-5 w-5 text-purple-400" />
-                  Professional Information
-                </h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="title2" className="text-gray-200">Professional Title</Label>
-                    <Input 
-                      id="title2" 
-                      name="title"
-                      value={profileData.title} 
-                      onChange={handleInputChange}
-                      placeholder="e.g. Senior Frontend Developer" 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="summary2" className="text-gray-200">Professional Summary</Label>
-                    <Textarea 
-                      id="summary2" 
-                      name="summary"
-                      value={profileData.summary} 
-                      onChange={handleInputChange}
-                      placeholder="Brief overview of your experience and goals" 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                      rows={4} 
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="skills" className="text-gray-200">Skills</Label>
-                    <Textarea 
-                      id="skills" 
-                      name="skills"
-                      value={profileData.skills} 
-                      onChange={handleInputChange}
-                      placeholder="e.g. JavaScript, React, CSS, etc." 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                      rows={3} 
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="resume2" className="text-gray-200 flex items-center gap-2">
-                      <FileTextIcon className="h-4 w-4" />
-                      Resume
-                    </Label>
-                    <div className="mt-1">
-                      {resumeFile ? (
-                        <p className="mb-2 text-sm text-gray-300 flex items-center gap-2 p-2 bg-white/5 rounded border border-white/10">
-                          <FileTextIcon className="h-4 w-4" />
-                          {resumeFile.name}
-                        </p>
-                      ) : null}
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={triggerResumeUpload}
-                        className="w-full border-white/20 text-white hover:bg-white/20"
-                      >
-                        <UploadIcon className="mr-2 h-4 w-4" />
-                        {resumeFile ? 'Change Resume' : 'Upload Resume'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Contact & Education */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <PhoneIcon className="mr-2 h-5 w-5 text-purple-400" />
-                  Contact & Education
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone2" className="text-gray-200">Phone Number</Label>
-                      <Input 
-                        id="phone2" 
-                        name="phone"
-                        value={profileData.phone} 
-                        onChange={handleInputChange}
-                        placeholder="Your phone number" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="location2" className="text-gray-200">Location</Label>
-                      <Input 
-                        id="location2" 
-                        name="location"
-                        value={profileData.location} 
-                        onChange={handleInputChange}
-                        placeholder="City, Country" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="linkedin" className="text-gray-200 flex items-center gap-1">
-                        <LinkedinIcon className="h-3.5 w-3.5" />
-                        LinkedIn
-                      </Label>
-                      <Input 
-                        id="linkedin" 
-                        name="linkedin"
-                        value={profileData.linkedin} 
-                        onChange={handleInputChange}
-                        placeholder="linkedin.com/in/username" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="github" className="text-gray-200 flex items-center gap-1">
-                        <GithubIcon className="h-3.5 w-3.5" />
-                        GitHub
-                      </Label>
-                      <Input 
-                        id="github" 
-                        name="github"
-                        value={profileData.github} 
-                        onChange={handleInputChange}
-                        placeholder="github.com/username" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="education" className="text-gray-200 flex items-center gap-1">
-                      <GraduationCapIcon className="h-4 w-4" />
-                      Education
-                    </Label>
-                    <Textarea 
-                      id="education" 
-                      name="education"
-                      value={profileData.education} 
-                      onChange={handleInputChange}
-                      placeholder="Your educational background" 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                      rows={3} 
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-8 flex justify-end">
-              <Button 
-                onClick={handleProfileUpdate}
-                disabled={isUpdating}
-                className="px-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-              >
-                {isUpdating ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <SaveIcon className="mr-2 h-4 w-4" />
-                    Save Profile
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

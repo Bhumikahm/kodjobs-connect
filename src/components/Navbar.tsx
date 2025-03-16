@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { BriefcaseIcon, LogInIcon, UserPlusIcon, MenuIcon, XIcon, HomeIcon, NewspaperIcon, DollarSignIcon } from 'lucide-react';
+import { Briefcase2Icon, LogInIcon, UserPlusIcon, MenuIcon, XIcon, HomeIcon, NewspaperIcon, DollarSignIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
@@ -25,6 +25,9 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Hide pricing in dashboard
+  const isDashboard = location.pathname === '/dashboard';
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -35,9 +38,13 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <BriefcaseIcon className="h-8 w-8 text-kod-blue" />
-            <span className="text-2xl font-display font-semibold bg-clip-text text-transparent bg-gradient-to-r from-kod-blue to-kod-blueDark">
-              KodJobs
+            <div className="relative h-10 w-10 rounded-full bg-gradient-to-r from-kod-blue to-purple-500 shadow-lg flex items-center justify-center overflow-hidden">
+              <Briefcase2Icon className="h-6 w-6 text-white absolute transform translate-y-[1px]" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-kod-blue/30 to-transparent"></div>
+            </div>
+            <span className="text-2xl font-display font-semibold">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-kod-blue to-kod-blueDark">Kod</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">Jobs</span>
             </span>
           </Link>
 
@@ -57,16 +64,19 @@ const Navbar = () => {
             </Button>
             <Button asChild variant="ghost" className="text-sm font-medium">
               <Link to="/jobs">
-                <BriefcaseIcon className="mr-2 h-4 w-4" />
+                <Briefcase2Icon className="mr-2 h-4 w-4" />
                 Jobs
               </Link>
             </Button>
-            <Button asChild variant="ghost" className="text-sm font-medium">
-              <Link to="/pricing">
-                <DollarSignIcon className="mr-2 h-4 w-4" />
-                Pricing
-              </Link>
-            </Button>
+            
+            {!isDashboard && (
+              <Button asChild variant="ghost" className="text-sm font-medium">
+                <Link to="/pricing">
+                  <DollarSignIcon className="mr-2 h-4 w-4" />
+                  Pricing
+                </Link>
+              </Button>
+            )}
             
             {isAuthenticated ? (
               <>
@@ -123,13 +133,16 @@ const Navbar = () => {
               Blog
             </Link>
             <Link to="/jobs" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
-              <BriefcaseIcon className="mr-2 h-4 w-4" />
+              <Briefcase2Icon className="mr-2 h-4 w-4" />
               Jobs
             </Link>
-            <Link to="/pricing" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
-              <DollarSignIcon className="mr-2 h-4 w-4" />
-              Pricing
-            </Link>
+            
+            {!isDashboard && (
+              <Link to="/pricing" className="px-6 py-3 hover:bg-kod-grayLight transition-colors flex items-center">
+                <DollarSignIcon className="mr-2 h-4 w-4" />
+                Pricing
+              </Link>
+            )}
             
             {isAuthenticated ? (
               <>
