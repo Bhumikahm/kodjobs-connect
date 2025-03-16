@@ -134,6 +134,13 @@
   50% { transform: translateY(-15px); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-10px) translateX(5px); }
+  50% { transform: translateY(0) translateX(10px); }
+  75% { transform: translateY(10px) translateX(5px); }
+}
+
 .animate-pulse-slow {
   animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -142,10 +149,38 @@
   animation: bounce-gentle 8s ease-in-out infinite;
 }
 
-/* Background gradient mesh for more attractive background */
-.bg-gradient-mesh {
-  background: linear-gradient(217deg, rgba(255,0,0,.1), rgba(255,0,0,0) 70.71%),
-              linear-gradient(127deg, rgba(0,255,0,.1), rgba(0,255,0,0) 70.71%),
-              linear-gradient(336deg, rgba(0,0,255,.1), rgba(0,0,255,0) 70.71%);
+.animate-float {
+  animation: float 12s ease-in-out infinite;
 }
 
+/* Background gradient mesh for more attractive background */
+.bg-gradient-mesh {
+  background: linear-gradient(217deg, rgba(139, 92, 246, 0.15), rgba(147, 51, 234, 0) 70.71%),
+              linear-gradient(127deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0) 70.71%),
+              linear-gradient(336deg, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0) 70.71%);
+}
+
+/* Enhanced mesh with more vibrant colors */
+.bg-gradient-mesh-vibrant {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0) 20%),
+    radial-gradient(circle at 90% 30%, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0) 25%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0) 30%),
+    radial-gradient(circle at 20% 70%, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 20%);
+}
+
+/* Nebula-like background effect */
+.bg-nebula {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3), transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3), transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.3), transparent 40%);
+  background-size: 200% 200%;
+  animation: nebula-shift 15s ease infinite;
+}
+
+@keyframes nebula-shift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}

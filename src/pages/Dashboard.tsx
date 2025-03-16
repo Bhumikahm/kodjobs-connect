@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { 
   BriefcaseIcon, 
@@ -28,7 +27,11 @@ import {
   CheckCircleIcon,
   UploadIcon,
   XIcon,
-  GraduationCapIcon
+  GraduationCapIcon,
+  BuildingIcon,
+  DollarSignIcon,
+  ClockIcon,
+  CalendarIcon
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -355,6 +358,8 @@ const Dashboard = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<typeof sampleJobs[0] | null>(null);
+  const [showJobModal, setShowJobModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -483,6 +488,11 @@ const Dashboard = () => {
     }
   };
 
+  const handleViewJobDetails = (job: typeof sampleJobs[0]) => {
+    setSelectedJob(job);
+    setShowJobModal(true);
+  };
+
   // Pagination logic
   const pageCount = Math.ceil(sampleJobs.length / jobsPerPage);
   const indexOfLastJob = currentPage * jobsPerPage;
@@ -499,7 +509,16 @@ const Dashboard = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-[#1A1F2C]/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16">
+        {/* Enhanced background with animated gradient patterns */}
+        <div className="absolute inset-0 bg-gradient-mesh opacity-20"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
+        
+        {/* Animated orbs */}
+        <div className="absolute top-1/4 left-10 w-20 h-20 bg-kod-blue/10 rounded-full blur-xl animate-bounce-gentle"></div>
+        <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse-slow"></div>
+        <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl animate-bounce-gentle"></div>
+      </div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mb-8">
@@ -787,208 +806,4 @@ const Dashboard = () => {
               </NavigationMenuItem>
               
               <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link to="/jobs" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
-                    <BriefcaseIcon className="h-4 w-4" />
-                    <span>Jobs</span>
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              
-              <NavigationMenuItem className="ml-auto">
-                <Button variant="ghost" onClick={logout} className="px-4 py-2 text-white hover:text-purple-300 hover:bg-white/10 transition-colors">
-                  Logout
-                </Button>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
-
-        <div className="mb-10">
-          <Tabs defaultValue="recommended" className="w-full">
-            <TabsList className="mb-8 bg-white/10 backdrop-blur-md p-1 rounded-lg border border-white/20">
-              <TabsTrigger value="recommended" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Recommended Jobs</TabsTrigger>
-              <TabsTrigger value="saved" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Saved Jobs</TabsTrigger>
-              <TabsTrigger value="applied" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Applied Jobs</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="recommended" className="mt-0">
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {currentJobs.map((job) => (
-                  <motion.div
-                    key={job.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: job.id % 8 * 0.1 }}
-                  >
-                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden group hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
-                      <CardHeader className="pb-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-xl group-hover:text-purple-300 transition-colors">{job.title}</CardTitle>
-                            <CardDescription className="mt-1 text-gray-300">{job.company} • {job.location}</CardDescription>
-                          </div>
-                          <div className="rounded-full px-3 py-1 text-xs font-medium bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30">
-                            {job.match}% Match
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-4 flex-1">
-                        <div className="flex gap-3 mb-4 flex-wrap">
-                          <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
-                            {job.type}
-                          </div>
-                          <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
-                            {job.salary}
-                          </div>
-                        </div>
-                        <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
-                      </CardContent>
-                      <CardFooter className="pt-0 flex items-center justify-between mt-auto">
-                        <span className="text-xs text-gray-400">Posted {job.posted}</span>
-                        {appliedJobs.includes(job.id) ? (
-                          <Button variant="outline" size="sm" className="border-green-500/50 text-green-300 flex items-center gap-2" disabled>
-                            <CheckCircleIcon className="h-4 w-4" />
-                            Applied
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white" 
-                            onClick={() => handleApplyJob(job.id)}
-                          >
-                            Apply Now
-                          </Button>
-                        )}
-                      </CardFooter>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-              
-              {/* Pagination */}
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) setCurrentPage(currentPage - 1);
-                      }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: pageCount }).map((_, index) => (
-                    <PaginationItem key={index}>
-                      <PaginationLink 
-                        href="#" 
-                        isActive={currentPage === index + 1}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(index + 1);
-                        }}
-                      >
-                        {index + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < pageCount) setCurrentPage(currentPage + 1);
-                      }}
-                      className={currentPage === pageCount ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </TabsContent>
-            
-            <TabsContent value="saved" className="mt-0">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
-                <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
-                  <BriefcaseIcon className="h-10 w-10 text-white/70" />
-                </div>
-                <h3 className="text-xl font-medium mb-2 text-white">No saved jobs yet</h3>
-                <p className="text-gray-300 mb-4">
-                  Save jobs you're interested in to revisit them later
-                </p>
-                <Button variant="outline" className="border-white/40 text-white hover:bg-white/20">Browse Jobs</Button>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="applied" className="mt-0">
-              {appliedJobs.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {appliedJobs.map(id => {
-                    const job = sampleJobs.find(j => j.id === id);
-                    if (!job) return null;
-                    
-                    return (
-                      <motion.div
-                        key={job.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden hover:shadow-glow hover:border-purple-500/50 transition-all duration-300 h-full flex flex-col">
-                          <CardHeader className="pb-4">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <CardTitle className="text-xl">{job.title}</CardTitle>
-                                <CardDescription className="mt-1 text-gray-300">{job.company} • {job.location}</CardDescription>
-                              </div>
-                              <div className="rounded-full px-3 py-1 text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
-                                Applied
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pb-4 flex-1">
-                            <div className="flex gap-3 mb-4 flex-wrap">
-                              <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
-                                {job.type}
-                              </div>
-                              <div className="text-sm px-3 py-1 bg-white/10 rounded-full border border-white/20">
-                                {job.salary}
-                              </div>
-                            </div>
-                            <p className="text-gray-300 text-sm line-clamp-2">{job.description}</p>
-                          </CardContent>
-                          <CardFooter className="pt-0 flex items-center justify-between mt-auto">
-                            <span className="text-xs text-gray-400">Applied just now</span>
-                            <Button variant="outline" size="sm" className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white">
-                              View Details
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
-                  <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
-                    <BriefcaseIcon className="h-10 w-10 text-white/70" />
-                  </div>
-                  <h3 className="text-xl font-medium mb-2 text-white">No applications yet</h3>
-                  <p className="text-gray-300 mb-4">
-                    When you apply to jobs, they will appear here
-                  </p>
-                  <Button variant="outline" className="border-white/40 text-white hover:bg-white/20">Browse Jobs</Button>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
+                <
