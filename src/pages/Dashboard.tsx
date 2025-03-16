@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Navigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   BriefcaseIcon, 
   UserIcon, 
@@ -28,7 +28,9 @@ import {
   NewspaperIcon,
   DollarSignIcon,
   CheckCircleIcon,
-  UploadIcon
+  UploadIcon,
+  XIcon,
+  SettingsIcon
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -85,8 +87,9 @@ const sampleJobs = [
 ];
 
 const Dashboard = () => {
-  const { user, isAuthenticated, isLoading, updateUser } = useAuth();
+  const { user, isAuthenticated, isLoading, updateUser, logout } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState({
     title: '',
     summary: '',
@@ -102,6 +105,7 @@ const Dashboard = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeInputRef = useRef<HTMLInputElement>(null);
 
@@ -151,6 +155,7 @@ const Dashboard = () => {
       });
       
       setIsUpdating(false);
+      setShowProfileModal(false);
       
       toast({
         title: "Profile updated",
@@ -237,7 +242,7 @@ const Dashboard = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="absolute inset-0 bg-gray-900/85 backdrop-blur-sm pt-20 pb-16"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mb-8">
@@ -248,19 +253,187 @@ const Dashboard = () => {
             className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
           >
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-white cursor-pointer transition-all hover:scale-105" onClick={triggerProfileImageUpload}>
-                <AvatarImage src={profileImage || undefined} />
-                <AvatarFallback className="bg-kod-blue text-white text-xl">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-                </AvatarFallback>
-              </Avatar>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleProfileImageChange} 
-                className="hidden" 
-                accept="image/*"
-              />
+              <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+                <DialogTrigger asChild>
+                  <Avatar className="h-16 w-16 border-2 border-white cursor-pointer transition-all hover:scale-105 hover:shadow-glow">
+                    <AvatarImage src={profileImage || undefined} />
+                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xl">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl w-[90vw] max-h-[90vh] overflow-y-auto bg-black/90 border border-white/20 text-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                      <UserIcon className="h-5 w-5 text-purple-400" />
+                      Profile Details
+                    </DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="grid md:grid-cols-2 gap-8 mt-6">
+                    <div className="space-y-6">
+                      <div className="flex flex-col items-center gap-4">
+                        <Avatar className="h-32 w-32 border-4 border-purple-500/40 cursor-pointer hover:border-purple-500/80 transition-all" onClick={triggerProfileImageUpload}>
+                          <AvatarImage src={profileImage || undefined} />
+                          <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-4xl">
+                            {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Button variant="outline" onClick={triggerProfileImageUpload} className="border-white/20 text-white hover:bg-white/10">
+                          <UploadIcon className="h-4 w-4 mr-2" />
+                          {profileImage ? 'Change Photo' : 'Upload Photo'}
+                        </Button>
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          onChange={handleProfileImageChange} 
+                          className="hidden" 
+                          accept="image/*"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="name" className="text-gray-200">Full Name</Label>
+                        <Input 
+                          id="name"
+                          name="name"
+                          value={user?.name || ''}
+                          readOnly
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="email" className="text-gray-200">Email Address</Label>
+                        <Input 
+                          id="email"
+                          name="email"
+                          value={user?.email || ''}
+                          readOnly
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="resume" className="text-gray-200 flex items-center gap-2">
+                          <FileTextIcon className="h-4 w-4" />
+                          Resume
+                        </Label>
+                        <div className="mt-1">
+                          <input 
+                            type="file" 
+                            id="resume" 
+                            ref={resumeInputRef}
+                            onChange={handleResumeUpload} 
+                            className="hidden" 
+                            accept=".pdf,.doc,.docx"
+                          />
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={triggerResumeUpload}
+                              className="w-full border-white/20 text-white hover:bg-white/20"
+                            >
+                              <UploadIcon className="mr-2 h-4 w-4" />
+                              {resumeFile ? 'Change Resume' : 'Upload Resume'}
+                            </Button>
+                          </div>
+                          {resumeFile && (
+                            <p className="mt-2 text-sm text-gray-300 flex items-center gap-2">
+                              <FileTextIcon className="h-4 w-4" />
+                              {resumeFile.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="title" className="text-gray-200">Professional Title</Label>
+                        <Input 
+                          id="title" 
+                          name="title"
+                          value={profileData.title} 
+                          onChange={handleInputChange}
+                          placeholder="e.g. Senior Frontend Developer" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="summary" className="text-gray-200">Professional Summary</Label>
+                        <Textarea 
+                          id="summary" 
+                          name="summary"
+                          value={profileData.summary} 
+                          onChange={handleInputChange}
+                          placeholder="Brief overview of your experience and goals" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                          rows={4} 
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="phone" className="text-gray-200 flex items-center gap-1">
+                            <PhoneIcon className="h-3.5 w-3.5" />
+                            Phone
+                          </Label>
+                          <Input 
+                            id="phone" 
+                            name="phone"
+                            value={profileData.phone} 
+                            onChange={handleInputChange}
+                            placeholder="Your phone number" 
+                            className="mt-1 bg-white/5 border-white/20 text-white" 
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="location" className="text-gray-200 flex items-center gap-1">
+                            <MapPinIcon className="h-3.5 w-3.5" />
+                            Location
+                          </Label>
+                          <Input 
+                            id="location" 
+                            name="location"
+                            value={profileData.location} 
+                            onChange={handleInputChange} 
+                            placeholder="City, Country" 
+                            className="mt-1 bg-white/5 border-white/20 text-white" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end gap-4 mt-8">
+                    <Button variant="outline" onClick={() => setShowProfileModal(false)} className="border-white/20 text-white hover:bg-white/10">
+                      <XIcon className="mr-2 h-4 w-4" />
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleProfileUpdate}
+                      disabled={isUpdating}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                    >
+                      {isUpdating ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <SaveIcon className="mr-2 h-4 w-4" />
+                          Save Profile
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
               
               <div>
                 <h1 className="text-3xl font-bold text-white">Welcome, {user?.name || "User"}</h1>
@@ -271,14 +444,14 @@ const Dashboard = () => {
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 shadow-sm w-full md:w-auto border border-white/20">
               <div className="flex items-center gap-3">
                 <div className="flex-none">
-                  <div className="h-12 w-12 rounded-full bg-kod-blue/30 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 flex items-center justify-center">
                     <UserIcon className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-200 mb-1">Profile Completion</p>
                   <div className="flex items-center gap-3">
-                    <Progress value={user?.profileCompletion || 0} className="h-2 flex-1" />
+                    <Progress value={user?.profileCompletion || 0} className="h-2 flex-1 bg-white/10" indicatorClassName="bg-gradient-to-r from-purple-500 to-pink-500" />
                     <span className="text-sm font-medium text-white">{user?.profileCompletion || 0}%</span>
                   </div>
                 </div>
@@ -292,7 +465,7 @@ const Dashboard = () => {
             <NavigationMenuList className="px-4 py-2">
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link to="/" className="flex items-center gap-2 px-4 py-2 text-white hover:text-kod-blue transition-colors">
+                  <Link to="/" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
                     <HomeIcon className="h-4 w-4" />
                     <span>Home</span>
                   </Link>
@@ -301,7 +474,7 @@ const Dashboard = () => {
               
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2 text-white hover:text-kod-blue transition-colors">
+                  <Link to="/blog" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
                     <NewspaperIcon className="h-4 w-4" />
                     <span>Blog</span>
                   </Link>
@@ -310,7 +483,7 @@ const Dashboard = () => {
               
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link to="/jobs" className="flex items-center gap-2 px-4 py-2 text-white hover:text-kod-blue transition-colors">
+                  <Link to="/jobs" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
                     <BriefcaseIcon className="h-4 w-4" />
                     <span>Jobs</span>
                   </Link>
@@ -319,11 +492,17 @@ const Dashboard = () => {
               
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link to="/pricing" className="flex items-center gap-2 px-4 py-2 text-white hover:text-kod-blue transition-colors">
+                  <Link to="/pricing" className="flex items-center gap-2 px-4 py-2 text-white hover:text-purple-300 transition-colors">
                     <DollarSignIcon className="h-4 w-4" />
                     <span>Pricing</span>
                   </Link>
                 </NavigationMenuLink>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem className="ml-auto">
+                <Button variant="ghost" onClick={logout} className="px-4 py-2 text-white hover:text-purple-300 hover:bg-white/10 transition-colors">
+                  Logout
+                </Button>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
@@ -332,9 +511,9 @@ const Dashboard = () => {
         <div className="mb-10">
           <Tabs defaultValue="recommended" className="w-full">
             <TabsList className="mb-8 bg-white/10 backdrop-blur-md p-1 rounded-lg border border-white/20">
-              <TabsTrigger value="recommended" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Recommended Jobs</TabsTrigger>
-              <TabsTrigger value="saved" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Saved Jobs</TabsTrigger>
-              <TabsTrigger value="applied" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Applied Jobs</TabsTrigger>
+              <TabsTrigger value="recommended" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Recommended Jobs</TabsTrigger>
+              <TabsTrigger value="saved" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Saved Jobs</TabsTrigger>
+              <TabsTrigger value="applied" className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white">Applied Jobs</TabsTrigger>
             </TabsList>
             
             <TabsContent value="recommended" className="mt-0">
@@ -346,14 +525,14 @@ const Dashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: job.id * 0.1 }}
                   >
-                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden card-hover">
+                    <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden group hover:shadow-glow hover:border-purple-500/50 transition-all duration-300">
                       <CardHeader className="pb-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl">{job.title}</CardTitle>
+                            <CardTitle className="text-xl group-hover:text-purple-300 transition-colors">{job.title}</CardTitle>
                             <CardDescription className="mt-1 text-gray-300">{job.company} • {job.location}</CardDescription>
                           </div>
-                          <div className="rounded-full px-3 py-1 text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
+                          <div className="rounded-full px-3 py-1 text-xs font-medium bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30">
                             {job.match}% Match
                           </div>
                         </div>
@@ -377,7 +556,12 @@ const Dashboard = () => {
                             Applied
                           </Button>
                         ) : (
-                          <Button variant="outline" size="sm" className="border-white/50 hover:bg-white/20 hover:text-white" onClick={() => handleApplyJob(job.id)}>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white" 
+                            onClick={() => handleApplyJob(job.id)}
+                          >
                             Apply Now
                           </Button>
                         )}
@@ -390,7 +574,7 @@ const Dashboard = () => {
             
             <TabsContent value="saved" className="mt-0">
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
-                <div className="h-20 w-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
                   <BriefcaseIcon className="h-10 w-10 text-white/70" />
                 </div>
                 <h3 className="text-xl font-medium mb-2 text-white">No saved jobs yet</h3>
@@ -415,7 +599,7 @@ const Dashboard = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden card-hover">
+                        <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white overflow-hidden hover:shadow-glow hover:border-purple-500/50 transition-all duration-300">
                           <CardHeader className="pb-4">
                             <div className="flex justify-between items-start">
                               <div>
@@ -440,7 +624,7 @@ const Dashboard = () => {
                           </CardContent>
                           <CardFooter className="pt-0 flex items-center justify-between">
                             <span className="text-xs text-gray-400">Applied just now</span>
-                            <Button variant="outline" size="sm" className="border-white/50 hover:bg-white/20 hover:text-white">
+                            <Button variant="outline" size="sm" className="border-white/50 hover:border-purple-500/70 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-white">
                               View Details
                             </Button>
                           </CardFooter>
@@ -451,7 +635,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 text-center border border-white/20">
-                  <div className="h-20 w-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                  <div className="h-20 w-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
                     <BriefcaseIcon className="h-10 w-10 text-white/70" />
                   </div>
                   <h3 className="text-xl font-medium mb-2 text-white">No applications yet</h3>
@@ -480,15 +664,15 @@ const Dashboard = () => {
               {/* Professional Info */}
               <div>
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <BriefcaseIcon className="mr-2 h-5 w-5 text-kod-blue" />
+                  <BriefcaseIcon className="mr-2 h-5 w-5 text-purple-400" />
                   Professional Information
                 </h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="title" className="text-gray-200">Professional Title</Label>
+                    <Label htmlFor="title2" className="text-gray-200">Professional Title</Label>
                     <Input 
-                      id="title" 
+                      id="title2" 
                       name="title"
                       value={profileData.title} 
                       onChange={handleInputChange}
@@ -498,9 +682,9 @@ const Dashboard = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="summary" className="text-gray-200">Professional Summary</Label>
+                    <Label htmlFor="summary2" className="text-gray-200">Professional Summary</Label>
                     <Textarea 
-                      id="summary" 
+                      id="summary2" 
                       name="summary"
                       value={profileData.summary} 
                       onChange={handleInputChange}
@@ -524,170 +708,29 @@ const Dashboard = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="resume" className="text-gray-200 flex items-center gap-2">
+                    <Label htmlFor="resume2" className="text-gray-200 flex items-center gap-2">
                       <FileTextIcon className="h-4 w-4" />
                       Resume
                     </Label>
                     <div className="mt-1">
-                      <input 
-                        type="file" 
-                        id="resume" 
-                        ref={resumeInputRef}
-                        onChange={handleResumeUpload} 
-                        className="hidden" 
-                        accept=".pdf,.doc,.docx"
-                      />
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={triggerResumeUpload}
-                          className="w-full border-white/20 text-white hover:bg-white/20"
-                        >
-                          <UploadIcon className="mr-2 h-4 w-4" />
-                          {resumeFile ? 'Change Resume' : 'Upload Resume'}
-                        </Button>
-                      </div>
-                      {resumeFile && (
-                        <p className="mt-2 text-sm text-gray-300 flex items-center gap-2">
+                      {resumeFile ? (
+                        <p className="mb-2 text-sm text-gray-300 flex items-center gap-2 p-2 bg-white/5 rounded border border-white/10">
                           <FileTextIcon className="h-4 w-4" />
                           {resumeFile.name}
                         </p>
-                      )}
+                      ) : null}
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={triggerResumeUpload}
+                        className="w-full border-white/20 text-white hover:bg-white/20"
+                      >
+                        <UploadIcon className="mr-2 h-4 w-4" />
+                        {resumeFile ? 'Change Resume' : 'Upload Resume'}
+                      </Button>
                     </div>
                   </div>
                 </div>
               </div>
               
               {/* Contact & Education */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <UserIcon className="mr-2 h-5 w-5 text-kod-blue" />
-                  Contact & Education
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone" className="text-gray-200 flex items-center gap-1">
-                        <PhoneIcon className="h-3.5 w-3.5" />
-                        Phone
-                      </Label>
-                      <Input 
-                        id="phone" 
-                        name="phone"
-                        value={profileData.phone} 
-                        onChange={handleInputChange}
-                        placeholder="Your phone number" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="location" className="text-gray-200 flex items-center gap-1">
-                        <MapPinIcon className="h-3.5 w-3.5" />
-                        Location
-                      </Label>
-                      <Input 
-                        id="location" 
-                        name="location"
-                        value={profileData.location} 
-                        onChange={handleInputChange} 
-                        placeholder="City, Country" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="linkedin" className="text-gray-200 flex items-center gap-1">
-                        <LinkedinIcon className="h-3.5 w-3.5" />
-                        LinkedIn
-                      </Label>
-                      <Input 
-                        id="linkedin" 
-                        name="linkedin"
-                        value={profileData.linkedin} 
-                        onChange={handleInputChange}
-                        placeholder="Your LinkedIn profile" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="github" className="text-gray-200 flex items-center gap-1">
-                        <GithubIcon className="h-3.5 w-3.5" />
-                        GitHub
-                      </Label>
-                      <Input 
-                        id="github" 
-                        name="github"
-                        value={profileData.github} 
-                        onChange={handleInputChange}
-                        placeholder="Your GitHub profile" 
-                        className="mt-1 bg-white/5 border-white/20 text-white" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="education" className="text-gray-200 flex items-center gap-1">
-                      <GraduationCapIcon className="h-3.5 w-3.5" />
-                      Education
-                    </Label>
-                    <Input 
-                      id="education" 
-                      name="education"
-                      value={profileData.education} 
-                      onChange={handleInputChange}
-                      placeholder="Your highest education" 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="experience" className="text-gray-200 flex items-center gap-1">
-                      <AwardIcon className="h-3.5 w-3.5" />
-                      Experience
-                    </Label>
-                    <Input 
-                      id="experience" 
-                      name="experience"
-                      value={profileData.experience} 
-                      onChange={handleInputChange}
-                      placeholder="Years of relevant experience" 
-                      className="mt-1 bg-white/5 border-white/20 text-white" 
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-8 flex justify-end">
-              <Button
-                onClick={handleProfileUpdate}
-                disabled={isUpdating}
-                className="bg-kod-blue hover:bg-kod-blueDark text-white"
-              >
-                {isUpdating ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <SaveIcon className="mr-2 h-4 w-4" />
-                    Save Profile
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
