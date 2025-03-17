@@ -11,26 +11,35 @@ const Home = () => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   useEffect(() => {
-    // Preload the hero image
+    // Preload the hero image - using a more job-focused image
     const img = new Image();
-    img.src = "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80";
+    img.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
     img.onload = () => setIsImageLoaded(true);
   }, []);
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section with improved job-themed background */}
       <section className="relative h-screen overflow-hidden">
         {/* Background Image with Blur Loading Effect */}
         <div 
           className={`absolute inset-0 transition-all duration-1000 ${isImageLoaded ? 'image-blur-loaded' : 'image-blur-loading'}`}
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
             backgroundSize: "cover",
             backgroundPosition: "center"
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+          {/* Enhanced overlay with animated gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
+          
+          {/* Additional visual elements */}
+          <div className="absolute inset-0 bg-gradient-mesh-vibrant opacity-40" />
+          <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+          
+          {/* Animated glow elements */}
+          <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-bounce-gentle"></div>
         </div>
 
         {/* Content */}
@@ -50,14 +59,14 @@ const Home = () => {
 
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
-                <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white">
+                <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-glow">
                   <Link to="/dashboard">
                     Go to Dashboard
                   </Link>
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white">
+                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-glow">
                     <Link to="/signup">
                       Get Started
                     </Link>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
@@ -11,6 +10,17 @@ interface User {
   dateOfBirth?: string;
   profileCompletion?: number;
   password?: string;
+  title?: string;
+  summary?: string;
+  skills?: string;
+  phone?: string;
+  location?: string;
+  linkedin?: string;
+  github?: string;
+  education?: string;
+  experience?: string;
+  resume?: boolean;
+  profileImage?: boolean;
 }
 
 interface AuthContextType {
@@ -21,6 +31,7 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string, dateOfBirth: string) => Promise<boolean>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
+  calculateProfileCompletion: (user: User) => number;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -34,7 +45,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Check for saved auth on initial load
+  const calculateProfileCompletion = (userData: User): number => {
+    const fields = [
+      { name: 'name', weight: 10 },
+      { name: 'email', weight: 10 },
+      { name: 'dateOfBirth', weight: 5 },
+      { name: 'title', weight: 5 },
+      { name: 'summary', weight: 10 },
+      
+      { name: 'phone', weight: 5 },
+      { name: 'location', weight: 5 },
+      { name: 'linkedin', weight: 5 },
+      { name: 'github', weight: 5 },
+      
+      { name: 'skills', weight: 10 },
+      { name: 'education', weight: 10 },
+      { name: 'experience', weight: 10 },
+      { name: 'resume', weight: 5 },
+      { name: 'profileImage', weight: 5 },
+    ];
+
+    let completionPercentage = 0;
+
+    fields.forEach(field => {
+      const value = userData[field.name as keyof User];
+      if (value && (typeof value === 'string' ? value.trim() !== '' : true)) {
+        completionPercentage += field.weight;
+      }
+    });
+
+    return Math.min(completionPercentage, 100);
+  };
+
   useEffect(() => {
     const savedUser = localStorage.getItem('kodjobs_user');
     if (savedUser) {
@@ -46,7 +88,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     
-    // Load users from localStorage if available
     const savedUsers = localStorage.getItem('kodjobs_users');
     if (savedUsers) {
       try {
@@ -55,32 +96,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Failed to parse saved users data:', error);
       }
     } else {
-      // Initialize users in localStorage
       localStorage.setItem('kodjobs_users', JSON.stringify(users));
     }
     
     setIsLoading(false);
   }, []);
 
-  // Login function that validates against stored users
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get users from localStorage
       const savedUsers = localStorage.getItem('kodjobs_users');
       const userList = savedUsers ? JSON.parse(savedUsers) : users;
       
-      // Find user with matching email and password
       const foundUser = userList.find(
         (u: User) => u.email === email && u.password === password
       );
       
       if (foundUser) {
-        // Create a safe user object without password for client storage
         const safeUser = { ...foundUser };
         delete safeUser.password;
         
@@ -114,19 +149,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Signup function that stores new users
   const signup = async (name: string, email: string, password: string, dateOfBirth: string) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get current users from localStorage
       const savedUsers = localStorage.getItem('kodjobs_users');
       const currentUsers = savedUsers ? JSON.parse(savedUsers) : users;
       
-      // Check if email already exists
       if (currentUsers.some((u: User) => u.email === email)) {
         toast({
           title: "Signup failed",
@@ -136,25 +167,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       
-      // For demo purposes, just check if required fields are not empty
       if (name && email && password && dateOfBirth) {
         const newUser: User = {
           id: Date.now().toString(),
           name,
           email,
-          password, // Store password for local authentication
+          password,
           dateOfBirth,
-          profileCompletion: 15, // Initial profile completion percentage
+          profileCompletion: 15,
         };
         
-        // Add user to the list
         const updatedUsers = [...currentUsers, newUser];
         setUsers(updatedUsers);
         
-        // Store updated users in localStorage
-        localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
-        
-        // Create a safe user object without password for client storage
         const safeUser = { ...newUser };
         delete safeUser.password;
         
@@ -201,15 +226,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
+      
+      if (userData.profileCompletion === undefined) {
+        updatedUser.profileCompletion = calculateProfileCompletion(updatedUser);
+      }
+      
       setUser(updatedUser);
       localStorage.setItem('kodjobs_user', JSON.stringify(updatedUser));
       
-      // Update user in users list as well
       const savedUsers = localStorage.getItem('kodjobs_users');
       if (savedUsers) {
         const userList = JSON.parse(savedUsers);
         const updatedUsers = userList.map((u: User) => 
-          u.id === user.id ? { ...u, ...userData } : u
+          u.id === user.id ? { ...u, ...userData, profileCompletion: updatedUser.profileCompletion } : u
         );
         localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
       }
@@ -224,7 +253,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login, 
       signup, 
       logout,
-      updateUser
+      updateUser,
+      calculateProfileCompletion
     }}>
       {children}
     </AuthContext.Provider>
