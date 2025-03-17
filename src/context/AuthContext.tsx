@@ -52,12 +52,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       { name: 'dateOfBirth', weight: 5 },
       { name: 'title', weight: 5 },
       { name: 'summary', weight: 10 },
-      
       { name: 'phone', weight: 5 },
       { name: 'location', weight: 5 },
       { name: 'linkedin', weight: 5 },
       { name: 'github', weight: 5 },
-      
       { name: 'skills', weight: 10 },
       { name: 'education', weight: 10 },
       { name: 'experience', weight: 10 },
@@ -66,15 +64,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ];
 
     let completionPercentage = 0;
+    let allFieldsFilled = true;
 
     fields.forEach(field => {
       const value = userData[field.name as keyof User];
       if (value && (typeof value === 'string' ? value.trim() !== '' : true)) {
         completionPercentage += field.weight;
+      } else {
+        allFieldsFilled = false;
       }
     });
 
-    return Math.min(completionPercentage, 100);
+    return allFieldsFilled ? 100 : Math.min(completionPercentage, 99);
   };
 
   useEffect(() => {
@@ -227,9 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const updatedUser = { ...user, ...userData };
       
-      if (userData.profileCompletion === undefined) {
-        updatedUser.profileCompletion = calculateProfileCompletion(updatedUser);
-      }
+      updatedUser.profileCompletion = calculateProfileCompletion(updatedUser);
       
       setUser(updatedUser);
       localStorage.setItem('kodjobs_user', JSON.stringify(updatedUser));

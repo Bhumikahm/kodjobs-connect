@@ -1,14 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { BriefcaseIcon, LogInIcon, UserPlusIcon } from 'lucide-react';
+import { BriefcaseIcon, LogInIcon, UserPlusIcon, LogOutIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,13 +19,13 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   // Don't show navbar on login or signup pages
   if (location.pathname === '/login' || location.pathname === '/signup') {
-    return null;
-  }
-
-  // If user is authenticated, redirect to dashboard
-  if (isAuthenticated && location.pathname === '/') {
     return null;
   }
 
@@ -48,18 +49,35 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10">
-              <Link to="/login">
-                <LogInIcon className="mr-2 h-5 w-5" />
-                Login
-              </Link>
-            </Button>
-            <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
-              <Link to="/signup">
-                <UserPlusIcon className="mr-2 h-5 w-5" />
-                Sign Up
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              location.pathname === '/dashboard' ? (
+                <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
+                  <LogOutIcon className="mr-2 h-5 w-5" />
+                  Logout
+                </Button>
+              ) : (
+                <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
+                  <Link to="/dashboard">
+                    Dashboard
+                  </Link>
+                </Button>
+              )
+            ) : (
+              <>
+                <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10">
+                  <Link to="/login">
+                    <LogInIcon className="mr-2 h-5 w-5" />
+                    Login
+                  </Link>
+                </Button>
+                <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
+                  <Link to="/signup">
+                    <UserPlusIcon className="mr-2 h-5 w-5" />
+                    Sign Up
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
