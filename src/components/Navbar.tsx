@@ -52,7 +52,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {location.pathname === '/dashboard' ? (
-                  <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
+                  <Button size="lg" variant="destructive" className="font-medium px-6" onClick={handleLogout}>
                     <LogOutIcon className="mr-2 h-5 w-5" />
                     Logout
                   </Button>
@@ -63,7 +63,7 @@ const Navbar = () => {
                         Dashboard
                       </Link>
                     </Button>
-                    <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
+                    <Button size="lg" variant="destructive" className="font-medium" onClick={handleLogout}>
                       <LogOutIcon className="mr-2 h-5 w-5" />
                       Logout
                     </Button>
@@ -72,7 +72,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10">
+                <Button asChild size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/20 hover:bg-white/30 font-medium">
                   <Link to="/login">
                     <LogInIcon className="mr-2 h-5 w-5" />
                     Login

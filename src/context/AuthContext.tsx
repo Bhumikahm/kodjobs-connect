@@ -67,12 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     fields.forEach(field => {
       const value = userData[field.name as keyof User];
-      if (value && (typeof value === 'string' ? value.trim() !== '' : true)) {
+      if (value !== undefined && value !== null && 
+          (typeof value === 'boolean' || 
+           (typeof value === 'string' && value.trim() !== ''))) {
         completionPercentage += field.weight;
       }
     });
 
-    return completionPercentage;
+    return Math.min(completionPercentage, 100);
   };
 
   useEffect(() => {
@@ -238,6 +240,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
         localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
       }
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
     }
   };
 
