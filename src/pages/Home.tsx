@@ -58,13 +58,13 @@ const Home = () => {
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg font-medium text-base px-8 py-3 h-auto">
+                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg font-semibold text-base px-8 py-4 h-auto">
                     <Link to="/signup">
                       <UserPlusIcon className="mr-2 h-5 w-5" />
                       Sign Up
                     </Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30 font-medium text-base px-8 py-3 h-auto">
+                  <Button asChild size="lg" variant="outline" className="bg-white/30 backdrop-blur-sm text-white border-white/50 hover:bg-white/40 font-semibold text-base px-8 py-4 h-auto">
                     <Link to="/login">
                       <LogInIcon className="mr-2 h-5 w-5" />
                       Sign In

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -36,7 +35,6 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-// Extended sample job listings (25 jobs)
 const sampleJobs = [
   {
     id: 1,
@@ -367,8 +365,6 @@ const Dashboard = () => {
   const jobsPerPage = 8;
 
   useEffect(() => {
-    // In a real app, we would fetch the profile data from the API
-    // For this demo, we're just setting dummy data after a timeout
     const timer = setTimeout(() => {
       setProfileData({
         title: 'Senior Frontend Developer',
@@ -404,9 +400,7 @@ const Dashboard = () => {
   const handleProfileUpdate = () => {
     setIsUpdating(true);
     
-    // Simulate API call
     setTimeout(() => {
-      // Update profile completion percentage
       updateUser({ 
         profileCompletion: 85 
       });
@@ -435,7 +429,6 @@ const Dashboard = () => {
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === 'string') {
           setProfileImage(event.target.result);
-          // Update profile completion
           updateUser({ 
             profileCompletion: (user?.profileCompletion || 0) + 5 > 100 ? 100 : (user?.profileCompletion || 0) + 5
           });
@@ -454,7 +447,6 @@ const Dashboard = () => {
     if (e.target.files && e.target.files[0]) {
       setResumeFile(e.target.files[0]);
       
-      // Update profile completion
       updateUser({ 
         profileCompletion: (user?.profileCompletion || 0) + 10 > 100 ? 100 : (user?.profileCompletion || 0) + 10
       });
@@ -494,7 +486,6 @@ const Dashboard = () => {
     setShowJobModal(true);
   };
 
-  // Pagination logic
   const pageCount = Math.ceil(sampleJobs.length / jobsPerPage);
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
@@ -511,11 +502,9 @@ const Dashboard = () => {
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-[#1A1F2C]/85 to-gray-900/90 backdrop-blur-sm pt-20 pb-16">
-        {/* Enhanced background with animated gradient patterns */}
         <div className="absolute inset-0 bg-gradient-mesh opacity-20"></div>
         <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
         
-        {/* Animated orbs */}
         <div className="absolute top-1/4 left-10 w-20 h-20 bg-kod-blue/10 rounded-full blur-xl animate-bounce-gentle"></div>
         <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse-slow"></div>
         <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl animate-bounce-gentle"></div>
@@ -539,6 +528,7 @@ const Dashboard = () => {
                     </AvatarFallback>
                   </Avatar>
                 </DialogTrigger>
+                
                 <DialogContent className="max-w-4xl w-[90vw] max-h-[90vh] overflow-y-auto bg-black/90 border border-white/20 text-white">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-bold flex items-center gap-2">
@@ -809,7 +799,6 @@ const Dashboard = () => {
           </NavigationMenu>
         </div>
 
-        {/* Main content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
@@ -857,10 +846,10 @@ const Dashboard = () => {
                         View Details
                       </Button>
                       <Button 
-                        variant="outline" 
+                        variant={appliedJobs.includes(job.id) ? "outline" : "default"}
                         className={appliedJobs.includes(job.id) 
                           ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
-                          : "border-white/20 text-white hover:bg-white/10"
+                          : "bg-kod-blue hover:bg-kod-blueDark text-white"
                         }
                         onClick={() => handleApplyJob(job.id)}
                         disabled={appliedJobs.includes(job.id)}
@@ -877,7 +866,6 @@ const Dashboard = () => {
                 ))}
               </div>
               
-              {/* Pagination */}
               <Pagination className="mt-6">
                 <PaginationContent className="text-white">
                   <PaginationItem>
@@ -1010,7 +998,6 @@ const Dashboard = () => {
         </div>
       </div>
       
-      {/* Job Details Modal */}
       <Dialog open={showJobModal} onOpenChange={setShowJobModal}>
         <DialogContent className="max-w-3xl w-[90vw] bg-black/90 border border-white/20 text-white">
           <DialogHeader>
@@ -1037,7 +1024,7 @@ const Dashboard = () => {
               </div>
               
               <div className="bg-white/10 px-3 py-1 rounded-full flex items-center">
-                <ClockIcon className="h-4 w-4 mr-1 text-gray-300" />
+                <ClockIcon className="h-4 w-4 mr-1 text-gray-400" />
                 <span className="text-sm text-gray-200">{selectedJob?.type}</span>
               </div>
               
@@ -1064,10 +1051,10 @@ const Dashboard = () => {
                 </div>
                 
                 <Button 
-                  variant="default" 
+                  variant={appliedJobs.includes(selectedJob?.id || 0) ? "outline" : "default"}
                   className={appliedJobs.includes(selectedJob?.id || 0) 
                     ? "bg-green-500/20 text-green-300 border-green-500/30 hover:bg-green-500/30"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                    : "bg-kod-blue hover:bg-kod-blueDark text-white font-medium px-6 py-2"
                   }
                   onClick={() => {
                     if (selectedJob) {

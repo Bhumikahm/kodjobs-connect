@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
@@ -225,18 +226,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUser = (userData: Partial<User>) => {
     if (user) {
+      // Create the updated user object
       const updatedUser = { ...user, ...userData };
       
-      updatedUser.profileCompletion = calculateProfileCompletion(updatedUser);
+      // Calculate the profile completion
+      const completionPercentage = calculateProfileCompletion(updatedUser);
+      updatedUser.profileCompletion = completionPercentage;
       
+      // Update state and localStorage
       setUser(updatedUser);
       localStorage.setItem('kodjobs_user', JSON.stringify(updatedUser));
       
+      // Update in the users list as well
       const savedUsers = localStorage.getItem('kodjobs_users');
       if (savedUsers) {
         const userList = JSON.parse(savedUsers);
         const updatedUsers = userList.map((u: User) => 
-          u.id === user.id ? { ...u, ...userData, profileCompletion: updatedUser.profileCompletion } : u
+          u.id === user.id ? { ...u, ...userData, profileCompletion: completionPercentage } : u
         );
         localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
       }
@@ -245,6 +251,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
+      
+      // Log for debugging
+      console.log("Updated user profile completion:", completionPercentage);
     }
   };
 
