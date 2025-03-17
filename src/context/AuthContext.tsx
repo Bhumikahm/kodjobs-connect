@@ -64,18 +64,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ];
 
     let completionPercentage = 0;
-    let allFieldsFilled = true;
 
     fields.forEach(field => {
       const value = userData[field.name as keyof User];
       if (value && (typeof value === 'string' ? value.trim() !== '' : true)) {
         completionPercentage += field.weight;
-      } else {
-        allFieldsFilled = false;
       }
     });
 
-    return allFieldsFilled ? 100 : Math.min(completionPercentage, 99);
+    return completionPercentage;
   };
 
   useEffect(() => {

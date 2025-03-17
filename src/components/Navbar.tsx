@@ -50,18 +50,26 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              location.pathname === '/dashboard' ? (
-                <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
-                  <LogOutIcon className="mr-2 h-5 w-5" />
-                  Logout
-                </Button>
-              ) : (
-                <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
-                  <Link to="/dashboard">
-                    Dashboard
-                  </Link>
-                </Button>
-              )
+              <>
+                {location.pathname === '/dashboard' ? (
+                  <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
+                    <LogOutIcon className="mr-2 h-5 w-5" />
+                    Logout
+                  </Button>
+                ) : (
+                  <div className="flex items-center space-x-4">
+                    <Button asChild size="lg" className="bg-gradient-to-r from-kod-blue to-kod-blueDark hover:from-kod-blueDark hover:to-kod-blue text-white">
+                      <Link to="/dashboard">
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <Button size="lg" variant="ghost" className="text-white hover:bg-white/10" onClick={handleLogout}>
+                      <LogOutIcon className="mr-2 h-5 w-5" />
+                      Logout
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/10">
