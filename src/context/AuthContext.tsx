@@ -46,7 +46,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // Helper function to sanitize user data by ensuring all string fields are actual strings, not objects
+  const sanitizeUserData = (userData: User): User => {
+    const sanitized = { ...userData };
+    
+    // Loop through all user properties
+    Object.keys(sanitized).forEach(key => {
+      const value = sanitized[key as keyof User];
+      // If the value is an object with _type property, replace it with empty string
+      if (value !== null && typeof value === 'object' && 'value' in (value as any)) {
+        sanitized[key as keyof User] = '' as any;
+      }
+    });
+    
+    return sanitized;
+  };
+  
   const calculateProfileCompletion = (userData: User): number => {
+    // First sanitize the user data to ensure proper calculation
+    const sanitizedUser = sanitizeUserData(userData);
+    
     const fields = [
       { name: 'name', weight: 10 },
       { name: 'email', weight: 10 },
@@ -67,23 +86,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let completionPercentage = 0;
 
     fields.forEach(field => {
-      const value = userData[field.name as keyof User];
+      const value = sanitizedUser[field.name as keyof User];
       if (value !== undefined && value !== null && 
           (typeof value === 'boolean' ? value === true : 
-           (typeof value === 'string' && value.trim() !== ''))) {
+           (typeof value === 'string' ? value.trim() !== '' : true))) {
         completionPercentage += field.weight;
       }
     });
 
     console.log("Profile completion fields:", fields.map(f => ({ 
       field: f.name, 
-      value: userData[f.name as keyof User], 
-      filled: userData[f.name as keyof User] !== undefined && 
-             userData[f.name as keyof User] !== null && 
-             (typeof userData[f.name as keyof User] === 'boolean' ? 
-               userData[f.name as keyof User] === true : 
-               (typeof userData[f.name as keyof User] === 'string' && 
-               (userData[f.name as keyof User] as string).trim() !== ''))
+      value: sanitizedUser[f.name as keyof User], 
+      filled: sanitizedUser[f.name as keyof User] !== undefined && 
+             sanitizedUser[f.name as keyof User] !== null && 
+             (typeof sanitizedUser[f.name as keyof User] === 'boolean' ? 
+               sanitizedUser[f.name as keyof User] === true : 
+               (typeof sanitizedUser[f.name as keyof User] === 'string' ? 
+               (sanitizedUser[f.name as keyof User] as string).trim() !== '' : true))
     })));
     
     console.log("Calculated profile completion:", completionPercentage);
@@ -95,12 +114,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
+        // Sanitize the user data before calculating profile completion
+        const sanitizedUser = sanitizeUserData(parsedUser);
         // Recalculate profile completion for the loaded user
-        const completion = calculateProfileCompletion(parsedUser);
-        parsedUser.profileCompletion = completion;
-        setUser(parsedUser);
-        // Update the user in localStorage with the recalculated completion
-        localStorage.setItem('kodjobs_user', JSON.stringify(parsedUser));
+        const completion = calculateProfileCompletion(sanitizedUser);
+        sanitizedUser.profileCompletion = completion;
+        setUser(sanitizedUser);
+        // Update the user in localStorage with the sanitized data and recalculated completion
+        localStorage.setItem('kodjobs_user', JSON.stringify(sanitizedUser));
       } catch (error) {
         console.error('Failed to parse saved user data:', error);
         localStorage.removeItem('kodjobs_user');
@@ -250,15 +271,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUser = (userData: Partial<User>) => {
     if (user) {
+      console.log("Raw update user data:", userData);
+      
+      // Create the updated user object, ensuring values are properly sanitized
+      const sanitizedUserData = Object.keys(userData).reduce((acc, key) => {
+        const value = userData[key as keyof typeof userData];
+        if (value !== null && typeof value === 'object' && 'value' in (value as any)) {
+          acc[key] = '';
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Partial<User>);
+      
+      console.log("Sanitized update user data:", sanitizedUserData);
+      
       // Create the updated user object
-      const updatedUser = { ...user, ...userData };
+      const updatedUser = { ...user, ...sanitizedUserData };
       
       // Calculate the profile completion
       const completionPercentage = calculateProfileCompletion(updatedUser);
       updatedUser.profileCompletion = completionPercentage;
       
       // Log for debugging
-      console.log("Updating user with data:", userData);
+      console.log("Updating user with data:", sanitizedUserData);
       console.log("Updated user profile completion:", completionPercentage);
       
       // Update state
@@ -274,7 +310,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const updatedUsers = userList.map((u: User) => {
           if (u.id === user.id) {
             // Create a complete user object with password
-            const completeUser = { ...u, ...userData };
+            const completeUser = { ...u, ...sanitizedUserData };
             completeUser.profileCompletion = completionPercentage;
             return completeUser;
           }
