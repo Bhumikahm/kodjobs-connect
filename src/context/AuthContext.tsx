@@ -75,6 +75,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
+    console.log("Profile completion fields:", fields.map(f => ({ 
+      field: f.name, 
+      value: userData[f.name as keyof User], 
+      filled: userData[f.name as keyof User] !== undefined && 
+             userData[f.name as keyof User] !== null && 
+             (typeof userData[f.name as keyof User] === 'boolean' ? 
+               userData[f.name as keyof User] === true : 
+               (typeof userData[f.name as keyof User] === 'string' && 
+               (userData[f.name as keyof User] as string).trim() !== ''))
+    })));
+    
+    console.log("Calculated profile completion:", completionPercentage);
     return Math.min(completionPercentage, 100);
   };
 
@@ -245,6 +257,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const completionPercentage = calculateProfileCompletion(updatedUser);
       updatedUser.profileCompletion = completionPercentage;
       
+      // Log for debugging
+      console.log("Updating user with data:", userData);
+      console.log("Updated user profile completion:", completionPercentage);
+      
       // Update state
       setUser(updatedUser);
       
@@ -271,10 +287,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
-      
-      // Log for debugging
-      console.log("Updated user profile:", updatedUser);
-      console.log("Updated user profile completion:", completionPercentage);
     }
   };
 

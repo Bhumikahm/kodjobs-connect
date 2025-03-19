@@ -365,22 +365,28 @@ const Dashboard = () => {
   const jobsPerPage = 8;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (user) {
       setProfileData({
-        title: 'Senior Frontend Developer',
-        summary: 'Passionate web developer with 5+ years of experience building modern web applications.',
-        skills: 'React, TypeScript, CSS, HTML, JavaScript, Node.js',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        linkedin: 'linkedin.com/in/username',
-        github: 'github.com/username',
-        education: 'BS Computer Science, Stanford University',
-        experience: '5+ years of frontend development experience'
+        title: user.title || '',
+        summary: user.summary || '',
+        skills: user.skills || '',
+        phone: user.phone || '',
+        location: user.location || '',
+        linkedin: user.linkedin || '',
+        github: user.github || '',
+        education: user.education || '',
+        experience: user.experience || ''
       });
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+      
+      if (user.profileImage) {
+        setProfileImage("profileImagePlaceholder");
+      }
+      
+      if (user.resume) {
+        setResumeFile(new File([""], "resume.pdf", { type: "application/pdf" }));
+      }
+    }
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -400,19 +406,17 @@ const Dashboard = () => {
   const handleProfileUpdate = () => {
     setIsUpdating(true);
     
-    setTimeout(() => {
-      updateUser({ 
-        profileCompletion: 85 
-      });
-      
-      setIsUpdating(false);
-      setShowProfileModal(false);
-      
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated",
-      });
-    }, 1000);
+    updateUser({ 
+      ...profileData
+    });
+    
+    setIsUpdating(false);
+    setShowProfileModal(false);
+    
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been successfully updated",
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -429,8 +433,9 @@ const Dashboard = () => {
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === 'string') {
           setProfileImage(event.target.result);
+          
           updateUser({ 
-            profileCompletion: (user?.profileCompletion || 0) + 5 > 100 ? 100 : (user?.profileCompletion || 0) + 5
+            profileImage: true
           });
           
           toast({
@@ -448,7 +453,7 @@ const Dashboard = () => {
       setResumeFile(e.target.files[0]);
       
       updateUser({ 
-        profileCompletion: (user?.profileCompletion || 0) + 10 > 100 ? 100 : (user?.profileCompletion || 0) + 10
+        resume: true
       });
       
       toast({
@@ -535,6 +540,9 @@ const Dashboard = () => {
                       <UserIcon className="h-5 w-5 text-purple-400" />
                       Profile Details
                     </DialogTitle>
+                    <DialogDescription className="text-gray-400">
+                      Complete your profile to increase your visibility to employers
+                    </DialogDescription>
                   </DialogHeader>
                   
                   <div className="grid md:grid-cols-2 gap-8 mt-6">
@@ -717,6 +725,32 @@ const Dashboard = () => {
                           value={profileData.education} 
                           onChange={handleInputChange}
                           placeholder="Your educational background" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                          rows={3} 
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="skills" className="text-gray-200">Skills</Label>
+                        <Textarea 
+                          id="skills" 
+                          name="skills"
+                          value={profileData.skills} 
+                          onChange={handleInputChange}
+                          placeholder="e.g. React, TypeScript, CSS, HTML, JavaScript" 
+                          className="mt-1 bg-white/5 border-white/20 text-white" 
+                          rows={3} 
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="experience" className="text-gray-200">Experience</Label>
+                        <Textarea 
+                          id="experience" 
+                          name="experience"
+                          value={profileData.experience} 
+                          onChange={handleInputChange}
+                          placeholder="Brief description of your work experience" 
                           className="mt-1 bg-white/5 border-white/20 text-white" 
                           rows={3} 
                         />
