@@ -21,7 +21,8 @@ interface User {
   education?: string;
   experience?: string;
   resume?: boolean;
-  profileImage?: boolean;
+  profileImage?: boolean | string;
+  profileImageUrl?: string;
 }
 
 interface AuthContextType {
@@ -33,6 +34,7 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   calculateProfileCompletion: (user: User) => number;
+  uploadProfileImage: (file: File) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -48,14 +50,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Helper function to sanitize user data by ensuring all string fields are actual strings, not objects
   const sanitizeUserData = (userData: User): User => {
-    const sanitized = { ...userData };
+    const sanitized = { ...userData } as User;
     
     // Loop through all user properties
     Object.keys(sanitized).forEach(key => {
       const value = sanitized[key as keyof User];
       // If the value is an object with _type property, replace it with empty string
       if (value !== null && typeof value === 'object' && 'value' in (value as any)) {
-        sanitized[key as keyof User] = '' as any;
+        (sanitized as any)[key] = '';
       }
     });
     
@@ -269,6 +271,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const uploadProfileImage = (file: File) => {
+    if (!user) return;
+    
+    try {
+      // Create a URL for the file
+      const imageUrl = URL.createObjectURL(file);
+      
+      // Update user with profile image URL
+      const updatedUserData: Partial<User> = {
+        profileImage: true,
+        profileImageUrl: imageUrl
+      };
+      
+      updateUser(updatedUserData);
+      
+      toast({
+        title: "Profile image uploaded",
+        description: "Your profile image has been updated successfully",
+      });
+    } catch (error) {
+      console.error('Profile image upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload profile image",
+        variant: "destructive",
+      });
+    }
+  };
+
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       console.log("Raw update user data:", userData);
@@ -282,7 +313,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           acc[key] = value;
         }
         return acc;
-      }, {} as Partial<User>);
+      }, {} as Record<string, any>);
       
       console.log("Sanitized update user data:", sanitizedUserData);
       
@@ -335,7 +366,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signup, 
       logout,
       updateUser,
-      calculateProfileCompletion
+      calculateProfileCompletion,
+      uploadProfileImage
     }}>
       {children}
     </AuthContext.Provider>

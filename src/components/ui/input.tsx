@@ -1,14 +1,27 @@
 
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     // Convert undefined values to empty strings to prevent object serialization issues
     const safeProps = { ...props };
+    
+    // Ensure value is a string, not an object
     if (safeProps.value !== null && typeof safeProps.value === 'object') {
       safeProps.value = '';
+    }
+    
+    // Ensure onChange handler works correctly with file inputs
+    if (type === 'file') {
+      const originalOnChange = safeProps.onChange;
+      
+      safeProps.onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // Preserve the original onChange handler
+        if (originalOnChange) {
+          originalOnChange(event);
+        }
+      };
     }
     
     return (
