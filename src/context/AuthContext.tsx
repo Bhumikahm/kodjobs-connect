@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
@@ -21,7 +20,7 @@ interface User {
   education?: string;
   experience?: string;
   resume?: boolean;
-  profileImage?: boolean | string;
+  profileImage?: boolean;
   profileImageUrl?: string;
 }
 
@@ -48,14 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Helper function to sanitize user data by ensuring all string fields are actual strings, not objects
   const sanitizeUserData = (userData: User): User => {
     const sanitized = { ...userData } as User;
     
-    // Loop through all user properties
     Object.keys(sanitized).forEach(key => {
       const value = sanitized[key as keyof User];
-      // If the value is an object with _type property, replace it with empty string
       if (value !== null && typeof value === 'object' && 'value' in (value as any)) {
         (sanitized as any)[key] = '';
       }
@@ -65,7 +61,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   const calculateProfileCompletion = (userData: User): number => {
-    // First sanitize the user data to ensure proper calculation
     const sanitizedUser = sanitizeUserData(userData);
     
     const fields = [
@@ -116,13 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        // Sanitize the user data before calculating profile completion
         const sanitizedUser = sanitizeUserData(parsedUser);
-        // Recalculate profile completion for the loaded user
         const completion = calculateProfileCompletion(sanitizedUser);
         sanitizedUser.profileCompletion = completion;
         setUser(sanitizedUser);
-        // Update the user in localStorage with the sanitized data and recalculated completion
         localStorage.setItem('kodjobs_user', JSON.stringify(sanitizedUser));
       } catch (error) {
         console.error('Failed to parse saved user data:', error);
@@ -161,7 +153,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const safeUser = { ...foundUser };
         delete safeUser.password;
         
-        // Recalculate profile completion
         safeUser.profileCompletion = calculateProfileCompletion(safeUser);
         
         setUser(safeUser);
@@ -221,7 +212,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dateOfBirth,
         };
         
-        // Calculate initial profile completion based on provided fields
         newUser.profileCompletion = calculateProfileCompletion(newUser);
         
         const updatedUsers = [...currentUsers, newUser];
@@ -275,10 +265,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     
     try {
-      // Create a URL for the file
-      const imageUrl = URL.createObjectURL(file);
+      console.log("Uploading profile image:", file.name);
       
-      // Update user with profile image URL
+      const imageUrl = URL.createObjectURL(file);
+      console.log("Created image URL:", imageUrl);
+      
       const updatedUserData: Partial<User> = {
         profileImage: true,
         profileImageUrl: imageUrl
@@ -304,7 +295,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       console.log("Raw update user data:", userData);
       
-      // Create the updated user object, ensuring values are properly sanitized
       const sanitizedUserData = Object.keys(userData).reduce((acc, key) => {
         const value = userData[key as keyof typeof userData];
         if (value !== null && typeof value === 'object' && 'value' in (value as any)) {
@@ -317,30 +307,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log("Sanitized update user data:", sanitizedUserData);
       
-      // Create the updated user object
       const updatedUser = { ...user, ...sanitizedUserData };
       
-      // Calculate the profile completion
       const completionPercentage = calculateProfileCompletion(updatedUser);
       updatedUser.profileCompletion = completionPercentage;
       
-      // Log for debugging
       console.log("Updating user with data:", sanitizedUserData);
       console.log("Updated user profile completion:", completionPercentage);
       
-      // Update state
       setUser(updatedUser);
       
-      // Update in localStorage
       localStorage.setItem('kodjobs_user', JSON.stringify(updatedUser));
       
-      // Update in the users list as well
       const savedUsers = localStorage.getItem('kodjobs_users');
       if (savedUsers) {
         const userList = JSON.parse(savedUsers);
         const updatedUsers = userList.map((u: User) => {
           if (u.id === user.id) {
-            // Create a complete user object with password
             const completeUser = { ...u, ...sanitizedUserData };
             completeUser.profileCompletion = completionPercentage;
             return completeUser;

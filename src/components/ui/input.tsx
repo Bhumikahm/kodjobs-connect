@@ -12,11 +12,16 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       safeProps.value = '';
     }
     
-    // Ensure onChange handler works correctly with file inputs
+    // Add specific handling for file inputs
     if (type === 'file') {
       const originalOnChange = safeProps.onChange;
       
       safeProps.onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // Make sure files are properly handled
+        if (event.target.files && event.target.files.length > 0) {
+          console.log("File selected:", event.target.files[0].name);
+        }
+        
         // Preserve the original onChange handler
         if (originalOnChange) {
           originalOnChange(event);

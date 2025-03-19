@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,15 @@ import { Upload, User } from 'lucide-react';
 const ProfileImageUpload: React.FC = () => {
   const { user, uploadProfileImage } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  useEffect(() => {
+    // Set the image preview from user data if available
+    if (user?.profileImageUrl) {
+      setImagePreview(user.profileImageUrl);
+    }
+  }, [user?.profileImageUrl]);
   
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -20,10 +28,18 @@ const ProfileImageUpload: React.FC = () => {
     
     setIsUploading(true);
     
+    // Create a local preview
+    const localPreview = URL.createObjectURL(file);
+    setImagePreview(localPreview);
+    
     try {
+      // Upload the file to the auth context
       uploadProfileImage(file);
+      console.log("Profile image uploaded successfully");
     } catch (error) {
       console.error('Error uploading image:', error);
+      // Revert preview on error
+      setImagePreview(user?.profileImageUrl || null);
     } finally {
       setIsUploading(false);
     }
@@ -39,8 +55,8 @@ const ProfileImageUpload: React.FC = () => {
   return (
     <div className="flex flex-col items-center gap-4">
       <Avatar className="h-32 w-32 border-2 border-primary">
-        {user?.profileImageUrl ? (
-          <AvatarImage src={user.profileImageUrl} alt={user?.name || 'User'} />
+        {imagePreview ? (
+          <AvatarImage src={imagePreview} alt={user?.name || 'User'} />
         ) : (
           <AvatarFallback className="text-2xl bg-primary/10">
             {user?.name ? getInitials(user.name) : <User />}
@@ -63,7 +79,7 @@ const ProfileImageUpload: React.FC = () => {
         disabled={isUploading}
       >
         <Upload size={16} />
-        {user?.profileImageUrl ? 'Change Photo' : 'Upload Photo'}
+        {imagePreview ? 'Change Photo' : 'Upload Photo'}
       </Button>
     </div>
   );
