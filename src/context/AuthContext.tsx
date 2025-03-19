@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fields.forEach(field => {
       const value = userData[field.name as keyof User];
       if (value !== undefined && value !== null && 
-          (typeof value === 'boolean' || 
+          (typeof value === 'boolean' ? value === true : 
            (typeof value === 'string' && value.trim() !== ''))) {
         completionPercentage += field.weight;
       }
@@ -82,7 +82,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedUser = localStorage.getItem('kodjobs_user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        // Recalculate profile completion for the loaded user
+        const completion = calculateProfileCompletion(parsedUser);
+        parsedUser.profileCompletion = completion;
+        setUser(parsedUser);
+        // Update the user in localStorage with the recalculated completion
+        localStorage.setItem('kodjobs_user', JSON.stringify(parsedUser));
       } catch (error) {
         console.error('Failed to parse saved user data:', error);
         localStorage.removeItem('kodjobs_user');
@@ -119,6 +125,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (foundUser) {
         const safeUser = { ...foundUser };
         delete safeUser.password;
+        
+        // Recalculate profile completion
+        safeUser.profileCompletion = calculateProfileCompletion(safeUser);
         
         setUser(safeUser);
         localStorage.setItem('kodjobs_user', JSON.stringify(safeUser));
@@ -175,11 +184,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email,
           password,
           dateOfBirth,
-          profileCompletion: 15,
         };
+        
+        // Calculate initial profile completion based on provided fields
+        newUser.profileCompletion = calculateProfileCompletion(newUser);
         
         const updatedUsers = [...currentUsers, newUser];
         setUsers(updatedUsers);
+        localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
         
         const safeUser = { ...newUser };
         delete safeUser.password;
@@ -233,17 +245,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const completionPercentage = calculateProfileCompletion(updatedUser);
       updatedUser.profileCompletion = completionPercentage;
       
-      // Update state and localStorage
+      // Update state
       setUser(updatedUser);
+      
+      // Update in localStorage
       localStorage.setItem('kodjobs_user', JSON.stringify(updatedUser));
       
       // Update in the users list as well
       const savedUsers = localStorage.getItem('kodjobs_users');
       if (savedUsers) {
         const userList = JSON.parse(savedUsers);
-        const updatedUsers = userList.map((u: User) => 
-          u.id === user.id ? { ...u, ...userData, profileCompletion: completionPercentage } : u
-        );
+        const updatedUsers = userList.map((u: User) => {
+          if (u.id === user.id) {
+            // Create a complete user object with password
+            const completeUser = { ...u, ...userData };
+            completeUser.profileCompletion = completionPercentage;
+            return completeUser;
+          }
+          return u;
+        });
         localStorage.setItem('kodjobs_users', JSON.stringify(updatedUsers));
       }
 
@@ -253,6 +273,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       // Log for debugging
+      console.log("Updated user profile:", updatedUser);
       console.log("Updated user profile completion:", completionPercentage);
     }
   };

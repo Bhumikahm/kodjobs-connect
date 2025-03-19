@@ -51,22 +51,22 @@ const Home = () => {
 
             <div className="flex flex-wrap gap-4">
               {isAuthenticated ? (
-                <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg">
+                <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg rounded-md text-lg py-6 px-8">
                   <Link to="/dashboard">
                     Go to Dashboard
                   </Link>
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg font-semibold text-base px-8 py-4 h-auto">
+                  <Button asChild size="lg" className="bg-kod-blue hover:bg-kod-blueDark text-white shadow-lg font-semibold text-lg px-10 py-6 h-auto rounded-md">
                     <Link to="/signup">
-                      <UserPlusIcon className="mr-2 h-5 w-5" />
+                      <UserPlusIcon className="mr-2 h-6 w-6" />
                       Sign Up
                     </Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="bg-white/30 backdrop-blur-sm text-white border-white/50 hover:bg-white/40 font-semibold text-base px-8 py-4 h-auto">
+                  <Button asChild size="lg" variant="outline" className="bg-white text-kod-blue border-white hover:bg-white/90 font-semibold text-lg px-10 py-6 h-auto rounded-md shadow-lg">
                     <Link to="/login">
-                      <LogInIcon className="mr-2 h-5 w-5" />
+                      <LogInIcon className="mr-2 h-6 w-6" />
                       Sign In
                     </Link>
                   </Button>
